@@ -1,4 +1,4 @@
-package com.nathaniel.travel_guide_app.dto.admin_dto;
+package com.nathaniel.travel_guide_app.dto.admin_dto.response;
 
 public class AdminActivityResponse {
 

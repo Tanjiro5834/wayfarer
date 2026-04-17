@@ -1,13 +1,10 @@
 package com.nathaniel.travel_guide_app.service.admin_service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
-import com.nathaniel.travel_guide_app.dto.admin_dto.AdminActivityResponse;
-import com.nathaniel.travel_guide_app.dto.admin_dto.AdminDashboardResponse;
+import com.nathaniel.travel_guide_app.dto.admin_dto.response.AdminDashboardResponse;
 import com.nathaniel.travel_guide_app.repository.CountryRepository;
 import com.nathaniel.travel_guide_app.repository.SavedDestinationRepository;
 import com.nathaniel.travel_guide_app.service.admin_service.interfaces.AdminDashboardService;
-import lombok.RequiredArgsConstructor;
 
 @Service
 public class AdminDashboardServiceImpl implements AdminDashboardService{

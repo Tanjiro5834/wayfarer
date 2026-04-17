@@ -3,7 +3,7 @@ package com.nathaniel.travel_guide_app.service.admin_service;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import com.nathaniel.travel_guide_app.dto.admin_dto.AdminActivityResponse;
+import com.nathaniel.travel_guide_app.dto.admin_dto.response.AdminActivityResponse;
 import com.nathaniel.travel_guide_app.entity.Country;
 import com.nathaniel.travel_guide_app.repository.CountryRepository;
 import com.nathaniel.travel_guide_app.service.admin_service.interfaces.AdminActivityService;
