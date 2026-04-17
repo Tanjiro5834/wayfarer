@@ -1,8 +1,11 @@
 package com.nathaniel.travel_guide_app.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import org.springframework.stereotype.Service;
-import com.nathaniel.travel_guide_app.dto.request.CountryRequest;
+import com.nathaniel.travel_guide_app.dto.admin_dto.request.CreateCountryRequest;
+import com.nathaniel.travel_guide_app.dto.admin_dto.request.UpdateCountryRequest;
 import com.nathaniel.travel_guide_app.dto.response.CountryResponse;
 import com.nathaniel.travel_guide_app.entity.Country;
 import com.nathaniel.travel_guide_app.mapper.CountryMapper;
@@ -18,7 +21,7 @@ public class CountryService {
 
     public List<CountryResponse> getAllCountries() {
         List<Country> countries = countryRepository.findAll();
-        List<CountryResponse> responseList = new java.util.ArrayList<>(countries.size());
+        List<CountryResponse> responseList = new ArrayList<>(countries.size());
 
         for(Country country : countries){
             country.setViewCount(country.getViewCount() + 1);
@@ -52,33 +55,35 @@ public class CountryService {
         .orElseThrow(() -> new RuntimeException("No countries found"));
     }
 
-    public CountryResponse createCountry(CountryRequest request){
-        if(countryRepository.findByName(request.getName()).isPresent()){
+    public CountryResponse createCountry(CreateCountryRequest request) {
+        if (countryRepository.findByName(request.getName()).isPresent()) {
             throw new RuntimeException("Country already exists");
         }
 
         Country country = new Country();
         country.setName(request.getName());
-        country.setOverview(request.getOverview());
-        country.setFlagUrl(request.getFlagUrl());
-        country.setViewCount(0);
+
+        //generate slug
+        String slug = generateSlug(request.getName());
+
+        country.setSlug(slug);
+        country.setUpdatedAt(LocalDateTime.now());
 
         Country saved = countryRepository.save(country);
-
         return countryMapper.mapToResponse(saved);
     }
 
     @Transactional
-    public CountryResponse updateCoutry(Long id, CountryRequest request){
+    public CountryResponse updateCountry(Long id, UpdateCountryRequest request){
         Country country = countryRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Country not found"));
 
-        country.setName(request.getName());
-        country.setOverview(request.getOverview());
-        country.setFlagUrl(request.getFlagUrl());
+        String slug = generateUniqueSlug(request.getName(), country);
 
+        country.setSlug(slug);
+        country.setUpdatedAt(LocalDateTime.now());
+        
         Country updated = countryRepository.save(country);
-
         return countryMapper.mapToResponse(updated);
     }
 
@@ -87,5 +92,25 @@ public class CountryService {
             throw new RuntimeException("Country not found");
         }
         countryRepository.deleteById(id);
+    }
+
+    private String generateSlug(String name) {
+        return name.toLowerCase()
+            .replaceAll("[^a-z0-9]+", "-")
+            .replaceAll("(^-|-$)", "");
+    }
+
+    private String generateUniqueSlug(String name, Country country) {
+        String baseSlug = generateSlug(name);
+        String slug = baseSlug;
+        int counter = 1;
+
+        while (countryRepository.findBySlug(slug).isPresent()
+        && !country.getSlug().equals(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+
+        return slug;
     }
 }

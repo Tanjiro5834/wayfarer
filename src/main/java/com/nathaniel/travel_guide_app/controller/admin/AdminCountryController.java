@@ -44,4 +44,9 @@ public class AdminCountryController {
     public void delete(@PathVariable Long id) {
         countryService.deleteCountry(id);
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "admin country controller reached";
+    }
 }
