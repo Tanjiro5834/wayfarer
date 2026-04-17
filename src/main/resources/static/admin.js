@@ -19,7 +19,7 @@ async function apiFetch(path, options = {}) {
 
   const headers = {
     ...(options.body ? { "Content-Type": "application/json" } : {}),
-    ...(options.headers || {})
+    ...(options.headers || {}),
   };
 
   if (token) {
@@ -28,7 +28,7 @@ async function apiFetch(path, options = {}) {
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers
+    headers,
   });
 
   if (response.status === 401) {
@@ -143,13 +143,13 @@ async function bootstrapAdminPage() {
     setLoadingState(true);
 
     await Promise.all([
-      loadDashboard().catch(err => {
+      loadDashboard().catch((err) => {
         console.warn("Dashboard load skipped:", err.message);
       }),
       loadCountries(),
-      loadActivity().catch(err => {
+      loadActivity().catch((err) => {
         console.warn("Activity load skipped:", err.message);
-      })
+      }),
     ]);
   } catch (err) {
     handleBootstrapError(err);
@@ -186,10 +186,14 @@ async function loadCountries() {
 async function loadDashboard() {
   const data = await apiFetch("/admin/dashboard");
 
-  if ($("totalCountries")) $("totalCountries").textContent = formatNumber(data.totalCountries ?? 0);
-  if ($("publishedGuides")) $("publishedGuides").textContent = formatNumber(data.publishedGuides ?? 0);
-  if ($("draftUpdates")) $("draftUpdates").textContent = formatNumber(data.draftUpdates ?? 0);
-  if ($("totalSaves")) $("totalSaves").textContent = formatNumber(data.totalSaves ?? 0);
+  if ($("totalCountries"))
+    $("totalCountries").textContent = formatNumber(data.totalCountries ?? 0);
+  if ($("publishedGuides"))
+    $("publishedGuides").textContent = formatNumber(data.publishedGuides ?? 0);
+  if ($("draftUpdates"))
+    $("draftUpdates").textContent = formatNumber(data.draftUpdates ?? 0);
+  if ($("totalSaves"))
+    $("totalSaves").textContent = formatNumber(data.totalSaves ?? 0);
 }
 
 async function loadActivity() {
@@ -213,15 +217,18 @@ function renderCountries(items) {
     return;
   }
 
-  tbody.innerHTML = items.map(country => {
-    const id = Number(country.id);
-    const flag = escapeHtml(country.flagEmoji || country.flag || "🌍");
-    const name = escapeHtml(country.name || "Unknown");
-    const region = escapeHtml(country.region || "-");
-    const status = country.status || inferCountryStatus(country);
-    const updatedAt = formatDate(country.updatedAt || country.updated_at || country.lastUpdated);
+  tbody.innerHTML = items
+    .map((country) => {
+      const id = Number(country.id);
+      const flag = escapeHtml(country.flagEmoji || country.flag || "🌍");
+      const name = escapeHtml(country.name || "Unknown");
+      const region = escapeHtml(country.region || "-");
+      const status = country.status || inferCountryStatus(country);
+      const updatedAt = formatDate(
+        country.updatedAt || country.updated_at || country.lastUpdated,
+      );
 
-    return `
+      return `
       <tr>
         <td>
           <div class="country-cell">
@@ -241,21 +248,22 @@ function renderCountries(items) {
         </td>
       </tr>
     `;
-  }).join("");
+    })
+    .join("");
 
   bindCountryActionButtons();
 }
 
 function bindCountryActionButtons() {
-  document.querySelectorAll("[data-action='view']").forEach(btn => {
+  document.querySelectorAll("[data-action='view']").forEach((btn) => {
     btn.addEventListener("click", () => handleView(Number(btn.dataset.id)));
   });
 
-  document.querySelectorAll("[data-action='edit']").forEach(btn => {
+  document.querySelectorAll("[data-action='edit']").forEach((btn) => {
     btn.addEventListener("click", () => handleEdit(Number(btn.dataset.id)));
   });
 
-  document.querySelectorAll("[data-action='delete']").forEach(btn => {
+  document.querySelectorAll("[data-action='delete']").forEach((btn) => {
     btn.addEventListener("click", () => handleDelete(Number(btn.dataset.id)));
   });
 }
@@ -285,17 +293,18 @@ function renderActivities(items) {
     return;
   }
 
-  container.innerHTML = items.map(item => {
-    const title = escapeHtml(item.title || item.action || "Activity");
-    const description = escapeHtml(
-      item.description ||
-      item.message ||
-      item.details ||
-      "No description available."
-    );
-    const status = item.status || item.type || "Info";
+  container.innerHTML = items
+    .map((item) => {
+      const title = escapeHtml(item.title || item.action || "Activity");
+      const description = escapeHtml(
+        item.description ||
+          item.message ||
+          item.details ||
+          "No description available.",
+      );
+      const status = item.status || item.type || "Info";
 
-    return `
+      return `
       <div class="list-item">
         <div>
           <h4>${title}</h4>
@@ -304,7 +313,8 @@ function renderActivities(items) {
         ${renderStatusBadge(status)}
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 /* ============ BADGES ============ */
@@ -329,11 +339,11 @@ function initNav() {
   const pageTitle = $("pageTitle");
   const pageSubtitle = $("pageSubtitle");
 
-  navItems.forEach(item => {
-    item.addEventListener("click", e => {
+  navItems.forEach((item) => {
+    item.addEventListener("click", (e) => {
       e.preventDefault();
 
-      navItems.forEach(nav => nav.classList.remove("active"));
+      navItems.forEach((nav) => nav.classList.remove("active"));
       item.classList.add("active");
 
       const section = item.dataset.section || "dashboard";
@@ -346,19 +356,32 @@ function initNav() {
 
 function formatSectionTitle(section) {
   switch (section) {
-    case "dashboard": return "Editorial Command Center";
-    case "analytics": return "Analytics Overview";
-    case "users": return "User Management";
-    case "countries": return "Country Management";
-    case "requirements": return "Entry Requirements";
-    case "budgets": return "Budget Guides";
-    case "packing": return "Packing Checklists";
-    case "tips": return "Local Tips";
-    case "culture": return "Culture Guides";
-    case "drafts": return "Draft Management";
-    case "publish": return "Publish Queue";
-    case "settings": return "System Settings";
-    default: return "Wayfarer Admin";
+    case "dashboard":
+      return "Editorial Command Center";
+    case "analytics":
+      return "Analytics Overview";
+    case "users":
+      return "User Management";
+    case "countries":
+      return "Country Management";
+    case "requirements":
+      return "Entry Requirements";
+    case "budgets":
+      return "Budget Guides";
+    case "packing":
+      return "Packing Checklists";
+    case "tips":
+      return "Local Tips";
+    case "culture":
+      return "Culture Guides";
+    case "drafts":
+      return "Draft Management";
+    case "publish":
+      return "Publish Queue";
+    case "settings":
+      return "System Settings";
+    default:
+      return "Wayfarer Admin";
   }
 }
 
@@ -401,12 +424,16 @@ function initSearch() {
   input.addEventListener("input", () => {
     const query = input.value.trim().toLowerCase();
 
-    filteredCountries = countries.filter(country => {
+    filteredCountries = countries.filter((country) => {
       const name = String(country.name || "").toLowerCase();
       const region = String(country.region || "").toLowerCase();
-      const status = String(country.status || inferCountryStatus(country)).toLowerCase();
+      const status = String(
+        country.status || inferCountryStatus(country),
+      ).toLowerCase();
 
-      return name.includes(query) || region.includes(query) || status.includes(query);
+      return (
+        name.includes(query) || region.includes(query) || status.includes(query)
+      );
     });
 
     renderCountries(filteredCountries);
@@ -435,18 +462,20 @@ function handleExportCountries() {
 
   const rows = [
     ["ID", "Flag", "Name", "Region", "Status", "Updated At"],
-    ...countries.map(country => [
+    ...countries.map((country) => [
       country.id ?? "",
       country.flagEmoji || country.flag || "",
       country.name || "",
       country.region || "",
       country.status || inferCountryStatus(country),
-      country.updatedAt || country.updated_at || country.lastUpdated || ""
-    ])
+      country.updatedAt || country.updated_at || country.lastUpdated || "",
+    ]),
   ];
 
   const csv = rows
-    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    .map((row) =>
+      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+    )
     .join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -467,9 +496,15 @@ function handleAddCountry() {
   currentEditingId = null;
   openCountryModal("Add Country", {
     name: "",
-    region: "",
-    flagEmoji: "",
-    status: "Draft"
+    code: "",
+    capital: "",
+    currency: "",
+    language: "",
+    timeZone: "",
+    bestTimeToVisit: "",
+    safetyLevel: "",
+    flagUrl: "",
+    overview: ""
   });
 }
 
@@ -482,9 +517,15 @@ function handleView(countryId) {
 
   openCountryModal("View Country", {
     name: country.name || "",
-    region: country.region || "",
-    flagEmoji: country.flagEmoji || country.flag || "",
-    status: country.status || inferCountryStatus(country)
+    code: country.code || "",
+    capital: country.capital || "",
+    currency: country.currency || "",
+    language: country.language || "",
+    timeZone: country.timeZone || "",
+    bestTimeToVisit: country.bestTimeToVisit || "",
+    safetyLevel: country.safetyLevel || "",
+    flagUrl: country.flagUrl || "",
+    overview: country.overview || ""
   }, true);
 }
 
@@ -498,9 +539,15 @@ function handleEdit(countryId) {
   currentEditingId = countryId;
   openCountryModal("Edit Country", {
     name: country.name || "",
-    region: country.region || "",
-    flagEmoji: country.flagEmoji || country.flag || "",
-    status: country.status || inferCountryStatus(country)
+    code: country.code || "",
+    capital: country.capital || "",
+    currency: country.currency || "",
+    language: country.language || "",
+    timeZone: country.timeZone || "",
+    bestTimeToVisit: country.bestTimeToVisit || "",
+    safetyLevel: country.safetyLevel || "",
+    flagUrl: country.flagUrl || "",
+    overview: country.overview || ""
   });
 }
 
@@ -510,7 +557,7 @@ async function handleDelete(countryId) {
 
   try {
     await apiFetch(`/admin/countries/${countryId}`, {
-      method: "DELETE"
+      method: "DELETE",
     });
 
     showToast("Country deleted.", "success");
@@ -533,11 +580,12 @@ function injectCountryModal() {
     inset: 0;
     background: rgba(10, 15, 30, 0.55);
     display: none;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     z-index: 9998;
-    padding: 20px;
-  `;
+    padding: 24px;
+    overflow-y: auto;
+    `;
 
   modal.innerHTML = `
     <div style="
@@ -563,28 +611,55 @@ function injectCountryModal() {
 
       <form id="countryForm">
         <div style="display:grid;gap:14px;">
-          <div>
+        <div>
             <label for="countryName" style="display:block;margin-bottom:8px;font-weight:600;">Name</label>
             <input id="countryName" name="name" type="text" required style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
-          </div>
+        </div>
 
-          <div>
-            <label for="countryRegion" style="display:block;margin-bottom:8px;font-weight:600;">Region</label>
-            <input id="countryRegion" name="region" type="text" required style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
-          </div>
+        <div>
+            <label for="countryCode" style="display:block;margin-bottom:8px;font-weight:600;">Code</label>
+            <input id="countryCode" name="code" type="text" placeholder="JPN" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
 
-          <div>
-            <label for="countryFlagEmoji" style="display:block;margin-bottom:8px;font-weight:600;">Flag Emoji</label>
-            <input id="countryFlagEmoji" name="flagEmoji" type="text" placeholder="🇯🇵" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
-          </div>
+        <div>
+            <label for="countryCapital" style="display:block;margin-bottom:8px;font-weight:600;">Capital</label>
+            <input id="countryCapital" name="capital" type="text" placeholder="Tokyo" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
 
-          <div>
-            <label for="countryStatus" style="display:block;margin-bottom:8px;font-weight:600;">Status</label>
-            <select id="countryStatus" name="status" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
-              <option value="Draft">Draft</option>
-              <option value="Published">Published</option>
-            </select>
-          </div>
+        <div>
+            <label for="countryCurrency" style="display:block;margin-bottom:8px;font-weight:600;">Currency</label>
+            <input id="countryCurrency" name="currency" type="text" placeholder="Japanese Yen" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countryLanguage" style="display:block;margin-bottom:8px;font-weight:600;">Language</label>
+            <input id="countryLanguage" name="language" type="text" placeholder="Japanese" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countryTimeZone" style="display:block;margin-bottom:8px;font-weight:600;">Time Zone</label>
+            <input id="countryTimeZone" name="timeZone" type="text" placeholder="JST (UTC+9)" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countryBestTimeToVisit" style="display:block;margin-bottom:8px;font-weight:600;">Best Time to Visit</label>
+            <input id="countryBestTimeToVisit" name="bestTimeToVisit" type="text" placeholder="March to May, October to November" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countrySafetyLevel" style="display:block;margin-bottom:8px;font-weight:600;">Safety Level</label>
+            <input id="countrySafetyLevel" name="safetyLevel" type="text" placeholder="High" style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countryFlagUrl" style="display:block;margin-bottom:8px;font-weight:600;">Flag URL</label>
+            <input id="countryFlagUrl" name="flagUrl" type="text" placeholder="https://..." style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;">
+        </div>
+
+        <div>
+            <label for="countryOverview" style="display:block;margin-bottom:8px;font-weight:600;">Overview</label>
+            <textarea id="countryOverview" name="overview" rows="5" placeholder="Write a short country overview..." style="width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;resize:vertical;"></textarea>
+        </div>
         </div>
 
         <div id="countryModalActions" style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;">
@@ -599,7 +674,7 @@ function injectCountryModal() {
 
   $("closeCountryModalBtn").addEventListener("click", closeCountryModal);
   $("cancelCountryBtn").addEventListener("click", closeCountryModal);
-  modal.addEventListener("click", e => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) closeCountryModal();
   });
 
@@ -609,11 +684,28 @@ function injectCountryModal() {
 function openCountryModal(title, values = {}, readOnly = false) {
   $("countryModalTitle").textContent = title;
   $("countryName").value = values.name || "";
-  $("countryRegion").value = values.region || "";
-  $("countryFlagEmoji").value = values.flagEmoji || "";
-  $("countryStatus").value = values.status || "Draft";
+  $("countryCode").value = values.code || "";
+  $("countryCapital").value = values.capital || "";
+  $("countryCurrency").value = values.currency || "";
+  $("countryLanguage").value = values.language || "";
+  $("countryTimeZone").value = values.timeZone || "";
+  $("countryBestTimeToVisit").value = values.bestTimeToVisit || "";
+  $("countrySafetyLevel").value = values.safetyLevel || "";
+  $("countryFlagUrl").value = values.flagUrl || "";
+  $("countryOverview").value = values.overview || "";
 
-  ["countryName", "countryRegion", "countryFlagEmoji", "countryStatus"].forEach(id => {
+  [
+    "countryName",
+    "countryCode",
+    "countryCapital",
+    "countryCurrency",
+    "countryLanguage",
+    "countryTimeZone",
+    "countryBestTimeToVisit",
+    "countrySafetyLevel",
+    "countryFlagUrl",
+    "countryOverview"
+  ].forEach(id => {
     $(id).disabled = readOnly;
   });
 
@@ -632,13 +724,19 @@ async function submitCountryForm(event) {
 
   const payload = {
     name: $("countryName").value.trim(),
-    region: $("countryRegion").value.trim(),
-    flagEmoji: $("countryFlagEmoji").value.trim(),
-    status: $("countryStatus").value
+    code: $("countryCode").value.trim(),
+    capital: $("countryCapital").value.trim(),
+    currency: $("countryCurrency").value.trim(),
+    language: $("countryLanguage").value.trim(),
+    timeZone: $("countryTimeZone").value.trim(),
+    bestTimeToVisit: $("countryBestTimeToVisit").value.trim(),
+    safetyLevel: $("countrySafetyLevel").value.trim(),
+    flagUrl: $("countryFlagUrl").value.trim(),
+    overview: $("countryOverview").value.trim()
   };
 
-  if (!payload.name || !payload.region) {
-    showToast("Name and region are required.", "warning");
+  if (!payload.name) {
+    showToast("Name is required.", "warning");
     return;
   }
 
@@ -676,7 +774,7 @@ function formatDate(value) {
   return date.toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
-    day: "numeric"
+    day: "numeric",
   });
 }
 

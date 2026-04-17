@@ -8,12 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CountryRequest {
-
     @NotBlank(message = "Name is required")
     private String name;
-
-    @NotBlank(message = "Slug is required")
-    private String slug;
 
     @Size(max = 3, message = "Code must be up to 3 characters (e.g., JPN)")
     private String code;

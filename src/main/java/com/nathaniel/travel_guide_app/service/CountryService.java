@@ -62,11 +62,16 @@ public class CountryService {
 
         Country country = new Country();
         country.setName(request.getName());
-
-        //generate slug
-        String slug = generateSlug(request.getName());
-
-        country.setSlug(slug);
+        country.setSlug(generateUniqueSlug(request.getName(), null));
+        country.setCode(request.getCode());
+        country.setCapital(request.getCapital());
+        country.setCurrency(request.getCurrency());
+        country.setLanguage(request.getLanguage());
+        country.setTimeZone(request.getTimeZone());
+        country.setBestTimeToVisit(request.getBestTimeToVisit());
+        country.setSafetyLevel(request.getSafetyLevel());
+        country.setFlagUrl(request.getFlagUrl());
+        country.setOverview(request.getOverview());
         country.setUpdatedAt(LocalDateTime.now());
 
         Country saved = countryRepository.save(country);
@@ -78,11 +83,11 @@ public class CountryService {
         Country country = countryRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Country not found"));
 
-        String slug = generateUniqueSlug(request.getName(), country);
+        String slug = generateUniqueSlug(request.getName(), country.getId());
 
         country.setSlug(slug);
         country.setUpdatedAt(LocalDateTime.now());
-        
+
         Country updated = countryRepository.save(country);
         return countryMapper.mapToResponse(updated);
     }
@@ -100,17 +105,22 @@ public class CountryService {
             .replaceAll("(^-|-$)", "");
     }
 
-    private String generateUniqueSlug(String name, Country country) {
+    private String generateUniqueSlug(String name, Long currentCountryId) {
         String baseSlug = generateSlug(name);
         String slug = baseSlug;
         int counter = 1;
 
-        while (countryRepository.findBySlug(slug).isPresent()
-        && !country.getSlug().equals(slug)) {
-            slug = baseSlug + "-" + counter;
-            counter++;
-        }
+        while(true){
+            var existing = countryRepository.findBySlug(slug);
+            if(existing.isEmpty()){
+                return slug;
+            }
 
-        return slug;
+            if(currentCountryId != null && existing.get().getId().equals(currentCountryId)){
+                return slug;
+            }
+
+            slug = baseSlug + "-" + counter++;
+        }
     }
 }
