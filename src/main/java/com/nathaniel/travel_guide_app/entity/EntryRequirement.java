@@ -13,7 +13,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "entry_requirements")
-@Getter 
+@Getter
 @Setter
 public class EntryRequirement {
 
@@ -25,14 +25,17 @@ public class EntryRequirement {
     @JoinColumn(name = "country_id", nullable = false, unique = true)
     private Country country;
 
-    private Boolean visaRequired;
-    private String passportValidityRule;
-    private String requiredDocuments;
-    private Boolean returnTicketRequired;
-    private Boolean proofOfAccommodationRequired;
-    private Boolean travelInsuranceRequired;
+    private String visaType;
+    private Integer maxStayDays;
+    private String passportValidityRequired;
+    private String travelInsurance;
+
+    @Column(length = 2000)
     private String vaccinationRequirements;
 
     @Column(length = 2000)
     private String customsNotes;
+
+    @Column(length = 2000)
+    private String additionalNotes;
 }

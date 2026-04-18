@@ -6,4 +6,5 @@ import com.nathaniel.travel_guide_app.entity.EntryRequirement;
 
 public interface EntryRequirementRepository extends JpaRepository<EntryRequirement, Long> {
     Optional<EntryRequirement> findByCountryId(Long countryId);
+    boolean existsByCountryId(Long countryId);
 }

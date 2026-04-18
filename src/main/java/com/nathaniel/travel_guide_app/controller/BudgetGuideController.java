@@ -17,6 +17,16 @@ public class BudgetGuideController {
 
     @GetMapping("/country/{countryId}")
     public ResponseEntity<BudgetGuide> getByCountry(@PathVariable Long countryId) {
-        return ResponseEntity.ok(budgetService.getByCountryId(countryId));
+        BudgetGuide data = budgetService.getByCountryId(countryId);
+        if (data == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "BUDGET OK";
     }
 }

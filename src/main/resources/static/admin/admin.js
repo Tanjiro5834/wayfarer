@@ -44,8 +44,10 @@ async function apiFetch(path, options = {}) {
   }
 
   if (!response.ok) {
-    const text = await response.text().catch(() => response.statusText);
-    throw new Error(text || response.statusText);
+    const text = await response.text().catch(() => "");
+    const error = new Error(text || response.statusText || "Request failed");
+    error.status = response.status;
+    throw error;
   }
 
   if (response.status === 204) {
@@ -222,7 +224,7 @@ function renderPackingCard(country, groups) {
 
   const preview = (groups || [])
     .slice(0, 3)
-    .map(group => {
+    .map((group) => {
       const label = escapeHtml(group.category || group.name || "General");
       const count = Array.isArray(group.items) ? group.items.length : 0;
       return `<span class="req-tag">${label}: ${count}</span>`;
@@ -257,11 +259,17 @@ function renderTipCard(country, groupedTips) {
     : "🌍";
 
   const entries = Object.entries(groupedTips || {});
-  const total = entries.reduce((sum, [, arr]) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+  const total = entries.reduce(
+    (sum, [, arr]) => sum + (Array.isArray(arr) ? arr.length : 0),
+    0,
+  );
 
-  const preview = entries.slice(0, 4).map(([category, arr]) => {
-    return `<span class="req-tag">${escapeHtml(category)}: ${Array.isArray(arr) ? arr.length : 0}</span>`;
-  }).join("");
+  const preview = entries
+    .slice(0, 4)
+    .map(([category, arr]) => {
+      return `<span class="req-tag">${escapeHtml(category)}: ${Array.isArray(arr) ? arr.length : 0}</span>`;
+    })
+    .join("");
 
   return `
     <div class="req-card">
@@ -290,8 +298,12 @@ function renderCultureCard(country, groupedCulture) {
     ? `<img src="${escapeHtml(country.flagUrl)}" alt="${name} flag" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`
     : "🌍";
 
-  const dos = Array.isArray(groupedCulture?.dos) ? groupedCulture.dos.length : 0;
-  const donts = Array.isArray(groupedCulture?.donts) ? groupedCulture.donts.length : 0;
+  const dos = Array.isArray(groupedCulture?.dos)
+    ? groupedCulture.dos.length
+    : 0;
+  const donts = Array.isArray(groupedCulture?.donts)
+    ? groupedCulture.donts.length
+    : 0;
   const notes = groupedCulture?.notes ? 1 : 0;
 
   return `
@@ -338,7 +350,7 @@ async function loadRequirements() {
       } catch {
         return null;
       }
-    })
+    }),
   );
 
   const valid = results.filter(Boolean);
@@ -346,34 +358,41 @@ async function loadRequirements() {
   setText("requirementsTotalCount", valid.length);
   setText(
     "requirementsPublishedCount",
-    valid.filter(item => isPublished(item.country)).length
+    valid.filter((item) => isPublished(item.country)).length,
   );
   setText(
     "requirementsNeedsReviewCount",
-    valid.filter(item => !isPublished(item.country)).length
+    valid.filter((item) => !isPublished(item.country)).length,
   );
 
   grid.innerHTML =
-    valid.map(item => renderRequirementCard(item.country, item.req)).join("") ||
-    emptyState("No entry requirements found.");
+    valid
+      .map((item) => renderRequirementCard(item.country, item.req))
+      .join("") || emptyState("No entry requirements found.");
 }
 
 function renderRequirementCard(country, req) {
   const name = escapeHtml(country.name || "Unknown");
   const region = escapeHtml(country.region || "General");
   const subRegion = escapeHtml(country.subRegion || "General");
-  const updatedAt = formatDate(country.updatedAt || country.updated_at || country.lastUpdated);
+  const updatedAt = formatDate(
+    country.updatedAt || country.updated_at || country.lastUpdated,
+  );
   const badge = renderStatusBadge(inferCountryStatus(country));
   const flag = country.flagUrl
     ? `<img src="${escapeHtml(country.flagUrl)}" alt="${name} flag" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`
     : "🌍";
 
   const tags = [
-    req?.visaType && `${escapeHtml(req.visaType)}`,
+    req?.visaType && escapeHtml(req.visaType),
     req?.maxStayDays != null && `Max stay: ${escapeHtml(req.maxStayDays)} days`,
-    req?.passportValidity && `Passport: ${escapeHtml(req.passportValidity)}`,
-    req?.vaccinationRequired != null && (req.vaccinationRequired ? "Vaccination Required" : "No Vaccination Required")
-  ].filter(Boolean).slice(0, 4);
+    req?.passportValidityRequired &&
+      `Passport: ${escapeHtml(req.passportValidityRequired)}`,
+    req?.vaccinationRequirements &&
+      `Vaccination: ${escapeHtml(req.vaccinationRequirements)}`,
+  ]
+    .filter(Boolean)
+    .slice(0, 4);
 
   return `
     <div class="req-card">
@@ -386,7 +405,7 @@ function renderRequirementCard(country, req) {
         <span style="margin-left:auto;">${badge}</span>
       </div>
       <div class="req-tags">
-        ${tags.map(tag => `<span class="req-tag">${tag}</span>`).join("")}
+        ${tags.map((tag) => `<span class="req-tag">${tag}</span>`).join("")}
       </div>
       <div class="req-actions">
         <button class="mini-btn primary">Edit</button>
@@ -417,7 +436,7 @@ async function loadBudgets() {
       } catch {
         return null;
       }
-    })
+    }),
   );
 
   const valid = results.filter(Boolean);
@@ -425,15 +444,15 @@ async function loadBudgets() {
   setText("budgetsTotalCount", valid.length);
   setText(
     "budgetsPublishedCount",
-    valid.filter(item => isPublished(item.country)).length
+    valid.filter((item) => isPublished(item.country)).length,
   );
   setText(
     "budgetsDraftCount",
-    valid.filter(item => !isPublished(item.country)).length
+    valid.filter((item) => !isPublished(item.country)).length,
   );
 
   grid.innerHTML =
-    valid.map(item => renderBudgetCard(item.country, item.budget)).join("") ||
+    valid.map((item) => renderBudgetCard(item.country, item.budget)).join("") ||
     emptyState("No budget guides found.");
 }
 
@@ -498,12 +517,14 @@ async function loadPacking() {
   const results = await Promise.all(
     list.map(async (country) => {
       try {
-        const groups = await apiFetch(`/packing-checklists/country/${country.id}`);
+        const groups = await apiFetch(
+          `/packing-checklists/country/${country.id}`,
+        );
         return { country, groups: Array.isArray(groups) ? groups : [] };
       } catch {
         return null;
       }
-    })
+    }),
   );
 
   const valid = results.filter(Boolean);
@@ -520,12 +541,13 @@ async function loadPacking() {
   setText("packingItemsCount", totalItems);
   setText(
     "packingPublishedCount",
-    valid.filter(item => isPublished(item.country)).length
+    valid.filter((item) => isPublished(item.country)).length,
   );
 
   grid.innerHTML =
-    valid.map(item => renderPackingCard(item.country, item.groups)).join("") ||
-    emptyState("No packing checklists found.");
+    valid
+      .map((item) => renderPackingCard(item.country, item.groups))
+      .join("") || emptyState("No packing checklists found.");
 }
 
 async function loadTips() {
@@ -549,27 +571,31 @@ async function loadTips() {
       } catch {
         return null;
       }
-    })
+    }),
   );
 
   const valid = results.filter(Boolean);
 
   const totalTips = valid.reduce((sum, item) => {
-    return sum + Object.values(item.groupedTips).reduce((inner, arr) => {
-      return inner + (Array.isArray(arr) ? arr.length : 0);
-    }, 0);
+    return (
+      sum +
+      Object.values(item.groupedTips).reduce((inner, arr) => {
+        return inner + (Array.isArray(arr) ? arr.length : 0);
+      }, 0)
+    );
   }, 0);
 
   setText("tipsTotalCount", valid.length);
   setText("tipsItemsCount", totalTips);
   setText(
     "tipsPublishedCount",
-    valid.filter(item => isPublished(item.country)).length
+    valid.filter((item) => isPublished(item.country)).length,
   );
 
   grid.innerHTML =
-    valid.map(item => renderTipCard(item.country, item.groupedTips)).join("") ||
-    emptyState("No local tips found.");
+    valid
+      .map((item) => renderTipCard(item.country, item.groupedTips))
+      .join("") || emptyState("No local tips found.");
 }
 
 async function loadCulture() {
@@ -588,12 +614,14 @@ async function loadCulture() {
   const results = await Promise.all(
     list.map(async (country) => {
       try {
-        const groupedCulture = await apiFetch(`/countries/${country.id}/culture`);
+        const groupedCulture = await apiFetch(
+          `/countries/${country.id}/culture`,
+        );
         return { country, groupedCulture: groupedCulture || {} };
       } catch {
         return null;
       }
-    })
+    }),
   );
 
   const valid = results.filter(Boolean);
@@ -601,16 +629,17 @@ async function loadCulture() {
   setText("cultureTotalCount", valid.length);
   setText(
     "culturePublishedCount",
-    valid.filter(item => isPublished(item.country)).length
+    valid.filter((item) => isPublished(item.country)).length,
   );
   setText(
     "cultureDraftCount",
-    valid.filter(item => !isPublished(item.country)).length
+    valid.filter((item) => !isPublished(item.country)).length,
   );
 
   grid.innerHTML =
-    valid.map(item => renderCultureCard(item.country, item.groupedCulture)).join("") ||
-    emptyState("No culture guides found.");
+    valid
+      .map((item) => renderCultureCard(item.country, item.groupedCulture))
+      .join("") || emptyState("No culture guides found.");
 }
 
 function emptyState(message) {
@@ -1617,15 +1646,28 @@ function initEntryModal() {
         return;
       }
 
+      const countryId = payload.countryId;
+
       try {
-        await apiFetch("/admin/entry-requirements", {
-          method: "POST",
+        await apiFetch(`/entry-requirements/country/${countryId}`);
+
+        await apiFetch(`/admin/entry-requirements/${countryId}`, {
+          method: "PUT",
           body: JSON.stringify(payload),
         });
-        showToast("Entry requirement saved.", "success");
-        closeModal("entryModal");
+
+        showToast("Entry requirement updated.", "success");
       } catch (err) {
-        showToast(`Failed: ${err.message}`, "error");
+        if (err.status === 404) {
+          await apiFetch("/admin/entry-requirements", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+
+          showToast("Entry requirement saved.", "success");
+        } else {
+          throw err;
+        }
       }
     });
 }
@@ -1656,31 +1698,34 @@ function initBudgetModal() {
   if (form)
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const payload = {
         countryId: Number($("budgetCountryId").value),
         currency: $("budgetCurrency").value.trim(),
-        budgetTier: {
-          accommodation: $("budgetBudgetAccommodation").value.trim(),
-          food: $("budgetBudgetFood").value.trim(),
-          transport: $("budgetBudgetTransport").value.trim(),
-          activities: $("budgetBudgetActivities").value.trim(),
-          dailyTotal: $("budgetBudgetTotal").value.trim(),
-        },
-        midRangeTier: {
-          accommodation: $("budgetMidAccommodation").value.trim(),
-          food: $("budgetMidFood").value.trim(),
-          transport: $("budgetMidTransport").value.trim(),
-          activities: $("budgetMidActivities").value.trim(),
-          dailyTotal: $("budgetMidTotal").value.trim(),
-        },
-        luxuryTier: {
-          accommodation: $("budgetLuxAccommodation").value.trim(),
-          food: $("budgetLuxFood").value.trim(),
-          transport: $("budgetLuxTransport").value.trim(),
-          activities: $("budgetLuxActivities").value.trim(),
-          dailyTotal: $("budgetLuxTotal").value.trim(),
-        },
-        savingTips: $("budgetSavingTips").value.trim(),
+
+        budgetDaily: $("budgetBudgetTotal").value
+          ? Number($("budgetBudgetTotal").value)
+          : null,
+
+        midRangeDaily: $("budgetMidTotal").value
+          ? Number($("budgetMidTotal").value)
+          : null,
+
+        luxuryDaily: $("budgetLuxTotal").value
+          ? Number($("budgetLuxTotal").value)
+          : null,
+
+        averageHotelCost: $("budgetBudgetAccommodation").value
+          ? Number($("budgetBudgetAccommodation").value)
+          : null,
+
+        averageMealCost: $("budgetBudgetFood").value
+          ? Number($("budgetBudgetFood").value)
+          : null,
+
+        averageTransportCost: $("budgetBudgetTransport").value
+          ? Number($("budgetBudgetTransport").value)
+          : null,
       };
 
       if (!payload.countryId) {
@@ -1693,8 +1738,11 @@ function initBudgetModal() {
           method: "POST",
           body: JSON.stringify(payload),
         });
+
         showToast("Budget guide saved.", "success");
         closeModal("budgetModal");
+
+        await loadBudgets(); // 🔥 important
       } catch (err) {
         showToast(`Failed: ${err.message}`, "error");
       }

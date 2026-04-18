@@ -29,6 +29,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                .requestMatchers("/api/admin/**").permitAll()
+
                 .requestMatchers(
                     "/",
                     "/index.html",
@@ -53,11 +55,12 @@ public class SecurityConfig {
                     "/api/packing-checklists/**"
                 ).permitAll()
 
-                .requestMatchers("/api/auth/me").authenticated()
-                .requestMatchers("/api/saved-destinations/**").authenticated()
-                .requestMatchers("/api/admin/**").permitAll()
+                .anyRequest().permitAll()
 
-                .anyRequest().authenticated()
+                // .requestMatchers("/api/auth/me").authenticated()
+                // .requestMatchers("/api/saved-destinations/**").authenticated()
+
+                //.anyRequest().authenticated()
             )
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());

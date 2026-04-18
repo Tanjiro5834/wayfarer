@@ -17,6 +17,11 @@ public class EntryRequirementController {
 
     @GetMapping("/country/{countryId}")
     public ResponseEntity<EntryRequirement> getByCountry(@PathVariable Long countryId) {
-        return ResponseEntity.ok(entryService.getByCountryId(countryId)); //
+        EntryRequirement data = entryService.getByCountryId(countryId);
+        if (data == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(data);
     }
 }
