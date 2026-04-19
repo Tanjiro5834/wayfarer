@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travi Admin — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+    }
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .login-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    .login-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .login-error {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      font-size: 0.85rem;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .login-error.visible { display: block; }
+    .login-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      font-family: var(--font-body);
+      transition: background 0.2s ease;
+    }
+    .login-submit:hover { background: var(--primary-dark); }
+    .login-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-mark">T</div>
+      <div class="brand-text">
+        <h1 style="font-family:var(--font-display);font-size:1.1rem;line-height:1.1;">Travi Admin</h1>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Travel content operations</p>
+      </div>
+    </div>
+
+    <h2>Sign in</h2>
+    <p>Admin access only. Your session is token-secured.</p>
+
+    <div class="login-error" id="loginError">Invalid username or password.</div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="username" placeholder="admin" required />
+      </div>
+      <div class="form-group" style="margin-top:1rem;">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="login-submit" id="loginBtn">Sign In</button>
+    </form>
+  </div>
+
+  <script>
+    const API_BASE = "/api";
+
+    // Already logged in? Go straight to dashboard
+    if (localStorage.getItem("travi_token")) {
+      window.location.replace("admin.html");
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("loginBtn");
+      const errorEl = document.getElementById("loginError");
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      errorEl.classList.remove("visible");
+      btn.disabled = true;
+      btn.textContent = "Signing in…";
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (!res.ok) throw new Error("Invalid credentials");
+
+        const data = await res.json();
+        // Adjust `data.token` to match your backend's response field
+        localStorage.setItem("travi_token", data.token);
+        window.location.replace("admin.html");
+
+      } catch {
+        errorEl.classList.add("visible");
+        btn.disabled = false;
+        btn.textContent = "Sign In";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -9,11 +9,11 @@ let selectedSubRegion = null;
 
 /* ============ AUTH ============ */
 function getToken() {
-  return localStorage.getItem("wayfarer_token");
+  return localStorage.getItem("travi_token");
 }
 
 function clearToken() {
-  localStorage.removeItem("wayfarer_token");
+  localStorage.removeItem("travi_token");
 }
 
 /* ============ API ============ */
@@ -432,14 +432,19 @@ async function loadBudgets() {
     list.map(async (country) => {
       try {
         const budget = await apiFetch(`/budgets/country/${country.id}`);
+        if (!budget) return null;
         return { country, budget };
-      } catch {
+      } catch (err) {
+        console.warn(
+          `Budget load skipped for country ${country.id}:`,
+          err.message,
+        );
         return null;
       }
     }),
   );
 
-  const valid = results.filter(Boolean);
+  const valid = results.filter((item) => item && item.budget);
 
   setText("budgetsTotalCount", valid.length);
   setText(
@@ -456,14 +461,61 @@ async function loadBudgets() {
     emptyState("No budget guides found.");
 }
 
+function getTierMap(budget) {
+  const tiers = Array.isArray(budget?.tiers) ? budget.tiers : [];
+  return {
+    BUDGET: tiers.find((t) => t.tierName === "BUDGET") || null,
+    MID_RANGE: tiers.find((t) => t.tierName === "MID_RANGE") || null,
+    LUXURY: tiers.find((t) => t.tierName === "LUXURY") || null,
+  };
+}
+
+function formatMoneyRange(currency, min, max) {
+  if (min == null && max == null) return "-";
+  const symbol =
+    currency === "PHP" ? "₱" : currency === "USD" ? "$" : `${currency} `;
+  if (min != null && max != null) return `${symbol}${min}–${max}`;
+  if (min != null) return `${symbol}${min}+`;
+  return `${symbol}${max}`;
+}
+
 function renderBudgetCard(country, budget) {
   const name = escapeHtml(country.name || "Unknown");
   const flag = country.flagUrl
     ? `<img src="${escapeHtml(country.flagUrl)}" alt="${name} flag" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`
     : "🌍";
 
+  const currency = budget?.currency || "PHP";
+  const tierMap = getTierMap(budget);
+  const defaultTier = tierMap.BUDGET || tierMap.MID_RANGE || tierMap.LUXURY;
+
+  if (!defaultTier) {
+    return `
+      <div class="budget-card">
+        <div class="budget-card-header">
+          <div class="budget-country">
+            <div class="flag-box">${flag}</div>
+            <div>
+              <h4>${name}</h4>
+              <p>Per person / day</p>
+            </div>
+          </div>
+          ${renderStatusBadge(inferCountryStatus(country))}
+        </div>
+        <div class="budget-breakdown">
+          <div class="budget-row">
+            <span class="budget-row-label">No tier data</span>
+            <span class="budget-row-value">-</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const cardId = `budget-card-${country.id}`;
+
   return `
-    <div class="budget-card">
+    <div class="budget-card" id="${cardId}">
       <div class="budget-card-header">
         <div class="budget-country">
           <div class="flag-box">${flag}</div>
@@ -476,26 +528,38 @@ function renderBudgetCard(country, budget) {
       </div>
 
       <div class="budget-tier-tabs">
-        <button class="tier-tab active">Budget</button>
-        <button class="tier-tab">Mid</button>
-        <button class="tier-tab">Luxury</button>
+        <button class="tier-tab active" type="button" data-card-id="${cardId}" data-tier="BUDGET">Budget</button>
+        <button class="tier-tab" type="button" data-card-id="${cardId}" data-tier="MID_RANGE">Mid</button>
+        <button class="tier-tab" type="button" data-card-id="${cardId}" data-tier="LUXURY">Luxury</button>
       </div>
 
-      <div class="budget-breakdown">
-        <div class="budget-row"><span class="budget-row-label">Accommodation</span><span class="budget-row-value">${escapeHtml(budget?.accommodationBudget || "-")}</span></div>
-        <div class="budget-row"><span class="budget-row-label">Food</span><span class="budget-row-value">${escapeHtml(budget?.foodBudget || "-")}</span></div>
-        <div class="budget-row"><span class="budget-row-label">Transport</span><span class="budget-row-value">${escapeHtml(budget?.transportBudget || "-")}</span></div>
-        <div class="budget-row"><span class="budget-row-label">Activities</span><span class="budget-row-value">${escapeHtml(budget?.activityBudget || "-")}</span></div>
+      <div class="budget-breakdown" data-role="budget-breakdown">
+        <div class="budget-row">
+          <span class="budget-row-label">Accommodation</span>
+          <span class="budget-row-value">${formatMoneyRange(currency, defaultTier.accommodationMin, defaultTier.accommodationMax)}</span>
+        </div>
+        <div class="budget-row">
+          <span class="budget-row-label">Food</span>
+          <span class="budget-row-value">${formatMoneyRange(currency, defaultTier.foodMin, defaultTier.foodMax)}</span>
+        </div>
+        <div class="budget-row">
+          <span class="budget-row-label">Transport</span>
+          <span class="budget-row-value">${formatMoneyRange(currency, defaultTier.transportMin, defaultTier.transportMax)}</span>
+        </div>
+        <div class="budget-row">
+          <span class="budget-row-label">Activities</span>
+          <span class="budget-row-value">${formatMoneyRange(currency, defaultTier.activitiesMin, defaultTier.activitiesMax)}</span>
+        </div>
       </div>
 
-      <div class="budget-total">
+      <div class="budget-total" data-role="budget-total">
         <span>Daily Total</span>
-        <span>${escapeHtml(budget?.dailyTotal || "-")}</span>
+        <span>${formatMoneyRange(currency, defaultTier.dailyTotalMin, defaultTier.dailyTotalMax)}</span>
       </div>
 
       <div class="budget-card-footer">
-        <button class="mini-btn primary">Edit</button>
-        <button class="mini-btn">View</button>
+        <button class="mini-btn primary" type="button">Edit</button>
+        <button class="mini-btn" type="button">View</button>
       </div>
     </div>
   `;
@@ -1702,30 +1766,52 @@ function initBudgetModal() {
       const payload = {
         countryId: Number($("budgetCountryId").value),
         currency: $("budgetCurrency").value.trim(),
-
-        budgetDaily: $("budgetBudgetTotal").value
-          ? Number($("budgetBudgetTotal").value)
-          : null,
-
-        midRangeDaily: $("budgetMidTotal").value
-          ? Number($("budgetMidTotal").value)
-          : null,
-
-        luxuryDaily: $("budgetLuxTotal").value
-          ? Number($("budgetLuxTotal").value)
-          : null,
-
-        averageHotelCost: $("budgetBudgetAccommodation").value
-          ? Number($("budgetBudgetAccommodation").value)
-          : null,
-
-        averageMealCost: $("budgetBudgetFood").value
-          ? Number($("budgetBudgetFood").value)
-          : null,
-
-        averageTransportCost: $("budgetBudgetTransport").value
-          ? Number($("budgetBudgetTransport").value)
-          : null,
+        savingTips: $("budgetSavingTips").value.trim(),
+        tiers: [
+          {
+            tierName: "BUDGET",
+            accommodationMin: parseRangeMin(
+              $("budgetBudgetAccommodation").value,
+            ),
+            accommodationMax: parseRangeMax(
+              $("budgetBudgetAccommodation").value,
+            ),
+            foodMin: parseRangeMin($("budgetBudgetFood").value),
+            foodMax: parseRangeMax($("budgetBudgetFood").value),
+            transportMin: parseRangeMin($("budgetBudgetTransport").value),
+            transportMax: parseRangeMax($("budgetBudgetTransport").value),
+            activitiesMin: parseRangeMin($("budgetBudgetActivities").value),
+            activitiesMax: parseRangeMax($("budgetBudgetActivities").value),
+            dailyTotalMin: parseRangeMin($("budgetBudgetTotal").value),
+            dailyTotalMax: parseRangeMax($("budgetBudgetTotal").value),
+          },
+          {
+            tierName: "MID_RANGE",
+            accommodationMin: parseRangeMin($("budgetMidAccommodation").value),
+            accommodationMax: parseRangeMax($("budgetMidAccommodation").value),
+            foodMin: parseRangeMin($("budgetMidFood").value),
+            foodMax: parseRangeMax($("budgetMidFood").value),
+            transportMin: parseRangeMin($("budgetMidTransport").value),
+            transportMax: parseRangeMax($("budgetMidTransport").value),
+            activitiesMin: parseRangeMin($("budgetMidActivities").value),
+            activitiesMax: parseRangeMax($("budgetMidActivities").value),
+            dailyTotalMin: parseRangeMin($("budgetMidTotal").value),
+            dailyTotalMax: parseRangeMax($("budgetMidTotal").value),
+          },
+          {
+            tierName: "LUXURY",
+            accommodationMin: parseRangeMin($("budgetLuxAccommodation").value),
+            accommodationMax: parseRangeMax($("budgetLuxAccommodation").value),
+            foodMin: parseRangeMin($("budgetLuxFood").value),
+            foodMax: parseRangeMax($("budgetLuxFood").value),
+            transportMin: parseRangeMin($("budgetLuxTransport").value),
+            transportMax: parseRangeMax($("budgetLuxTransport").value),
+            activitiesMin: parseRangeMin($("budgetLuxActivities").value),
+            activitiesMax: parseRangeMax($("budgetLuxActivities").value),
+            dailyTotalMin: parseRangeMin($("budgetLuxTotal").value),
+            dailyTotalMax: parseRangeMax($("budgetLuxTotal").value),
+          },
+        ],
       };
 
       if (!payload.countryId) {
@@ -1800,6 +1886,22 @@ function addChecklistRow() {
     .querySelector(`[data-remove="${checklistRowCount}"]`)
     .addEventListener("click", () => row.remove());
   container.appendChild(row);
+}
+
+function parseRangeMin(value) {
+  if (!value) return null;
+  const clean = value.replace(/[₱$,]/g, "").trim();
+  if (clean.endsWith("+")) return Number(clean.replace("+", "").trim());
+  const [min] = clean.split("–");
+  return min ? Number(min.trim()) : null;
+}
+
+function parseRangeMax(value) {
+  if (!value) return null;
+  const clean = value.replace(/[₱$,]/g, "").trim();
+  if (clean.endsWith("+")) return null;
+  const parts = clean.split("–");
+  return parts[1] ? Number(parts[1].trim()) : null;
 }
 
 function initChecklistModal() {
@@ -2116,6 +2218,23 @@ function initCultureModal() {
       }
     });
 }
+
+// ===== TIER TAB SWITCH HANDLER =====
+document.addEventListener("click", (e) => {
+  const tab = e.target.closest(".tier-tab");
+  if (!tab) return;
+
+  const card = document.getElementById(tab.dataset.cardId);
+  if (!card) return;
+
+  const countryName = card.querySelector(".budget-country h4")?.textContent?.trim();
+  const country = countries.find((c) => c.name === countryName);
+  if (!country) return;
+
+  const tabs = card.querySelectorAll(".tier-tab");
+  tabs.forEach((t) => t.classList.remove("active"));
+  tab.classList.add("active");
+});
 
 /* ── Wire everything up on DOM ready ── */
 document.addEventListener("DOMContentLoaded", () => {
