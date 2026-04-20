@@ -1,2 +1,12 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Keep generated/minified frontend assets out of GitHub language stats
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+
+# Mark static assets as vendored/generated if needed
+src/main/resources/static/** linguist-vendored
+
+# Keep migration SQL counted if you want backend weight
+# *.sql linguist-language=SQL
