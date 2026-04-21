@@ -38,6 +38,7 @@ public class CategoryService {
         return categoryRepository.findByNameIgnoreCase(name).orElse(null);
     }
 
+    @Transactional
     public CategoryResponse create(CategoryRequest categoryRequest) {
         if(categoryRepository.findByNameIgnoreCase(categoryRequest.getName()).isPresent()){
             throw new RuntimeException("Category with name " + categoryRequest.getName() + " already exists");

@@ -42,7 +42,8 @@ public class PlaceService {
         return placeRepository.findByIsFeaturedTrue();
     }
 
-    public PlaceResponse create(PlaceRequest placeRequest) {
+    @Transactional
+    public PlaceResponse createPlace(PlaceRequest placeRequest) {
          Destination destination = destinationRepository.findById(placeRequest.getDestinationId())
             .orElseThrow(() -> new RuntimeException("Destination not found with id: " + placeRequest.getDestinationId()));
 
@@ -55,7 +56,7 @@ public class PlaceService {
     }
 
     @Transactional
-    public PlaceResponse update(Long id, PlaceRequest placeRequest) {
+    public PlaceResponse updatePlace(Long id, PlaceRequest placeRequest) {
         Place existing = placeRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Place not found with ID: " + id));
 
@@ -66,7 +67,8 @@ public class PlaceService {
         return placeMapper.toResponse(saved);
     }
 
-    public void delete(Long id) {
+    @Transactional
+    public void deletePlace(Long id) {
         Place existing = placeRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Place not found with ID: " + id));
         placeRepository.delete(existing);

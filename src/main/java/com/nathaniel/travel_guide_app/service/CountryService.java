@@ -56,6 +56,7 @@ public class CountryService {
                 .orElseThrow(() -> new RuntimeException("No countries found"));
     }
 
+    @Transactional
     public CountryResponse createCountry(CreateCountryRequest request) {
         if (countryRepository.findByName(request.getName()).isPresent()) {
             throw new RuntimeException("Country already exists");

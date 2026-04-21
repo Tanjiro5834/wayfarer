@@ -31,6 +31,7 @@ public class TripDayService {
             .orElseThrow(() -> new RuntimeException("Trip day not found with id: " + id));
     }
 
+    @Transactional
     public TripDayResponse createTripDay(TripDayRequest tripDayRequest) {
         Trip trip = tripRepository.findById(tripDayRequest.getTripId())
             .orElseThrow(() -> new RuntimeException("Trip not found with id: " + tripDayRequest.getTripId()));

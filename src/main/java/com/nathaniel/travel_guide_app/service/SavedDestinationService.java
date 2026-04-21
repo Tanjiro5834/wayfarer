@@ -12,6 +12,7 @@ import com.nathaniel.travel_guide_app.mapper.SavedDestinationMapper;
 import com.nathaniel.travel_guide_app.repository.SavedDestinationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +22,7 @@ public class SavedDestinationService {
     private final SavedDestinationMapper savedDestinationMapper;
     private final EntityManager entityManager;
 
+    @Transactional
     public SavedDestinationResponse saveDestination(Long userId, Long countryId){
         boolean exists = savedDestinationRepository.existsByUserIdAndCountryId(userId, countryId);
         if(exists){

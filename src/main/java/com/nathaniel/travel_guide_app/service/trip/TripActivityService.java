@@ -32,6 +32,7 @@ public class TripActivityService {
         return tripActivityRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public TripActivityResponse createTripActivity(TripActivityRequest tripActivityRequest) {
         TripDay tripDay = tripDayRepository.findById(tripActivityRequest.getTripDayId())
             .orElseThrow(() -> new RuntimeException("Trip day not found with ID: " + tripActivityRequest.getTripDayId()));
@@ -64,6 +65,7 @@ public class TripActivityService {
         tripActivityRepository.delete(tripActivity);
     }
 
+    @Transactional
     public List<TripActivity> reorderTripActivities(Long tripDayId, List<Long> orderedIds) {
         List<TripActivity> activities = tripActivityRepository.findByTripDayIdOrderBySortOrderAsc(tripDayId);
         Map<Long, TripActivity> activityMap = activities.stream()

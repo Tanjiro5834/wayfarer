@@ -30,6 +30,7 @@ public class DestinationService {
         return destinationRepository.findByType(type);
     }
 
+    @Transactional
     public DestinationResponse create(DestinationRequest destinationRequest){
         if(destinationRepository.findByName(destinationRequest.getName()).isPresent()){
             throw new RuntimeException("Destination with name " + destinationRequest.getName() + " already exists");

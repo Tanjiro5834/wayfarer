@@ -21,6 +21,7 @@ public class BudgetGuideService {
         .orElse(null);
     }
 
+    @Transactional
     public BudgetGuide create(BudgetGuideRequest request) {
         if (budgetGuideRepository.findByCountryId(request.getCountryId()).isPresent()) {
             throw new RuntimeException("Budget guide already exists for this country");
