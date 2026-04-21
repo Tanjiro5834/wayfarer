@@ -6,9 +6,9 @@
 *.min.css linguist-generated=true
 
 # Reduce frontend weight
-*.js linguist-detectable=false
-*.css linguist-detectable=false
-*.html linguist-detectable=false
+*.js linguist-detectable=true
+*.css linguist-detectable=true
+*.html linguist-detectable=true
 
 # Keep SQL counted
 *.sql linguist-language=SQL
