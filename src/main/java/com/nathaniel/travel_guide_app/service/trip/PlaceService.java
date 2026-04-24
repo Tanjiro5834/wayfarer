@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import com.nathaniel.travel_guide_app.dto.request.trip.PlaceRequest;
 import com.nathaniel.travel_guide_app.dto.response.trip.PlaceResponse;
 import com.nathaniel.travel_guide_app.entity.Category;
+import com.nathaniel.travel_guide_app.entity.Country;
 import com.nathaniel.travel_guide_app.entity.Destination;
 import com.nathaniel.travel_guide_app.entity.Place;
 import com.nathaniel.travel_guide_app.mapper.PlaceMapper;
+import com.nathaniel.travel_guide_app.repository.CountryRepository;
 import com.nathaniel.travel_guide_app.repository.Trip.CategoryRepository;
 import com.nathaniel.travel_guide_app.repository.Trip.DestinationRepository;
 import com.nathaniel.travel_guide_app.repository.Trip.PlaceRepository;
@@ -18,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PlaceService {
     private final PlaceRepository placeRepository;
-    private final DestinationRepository destinationRepository;
+    private final CountryRepository countryRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceMapper placeMapper;
 
@@ -26,16 +28,16 @@ public class PlaceService {
         return placeRepository.findById(id).orElse(null);
     }
 
-    public List<Place> getByDestination(Long destinationId) {
-        return placeRepository.findByDestinationId(destinationId);
+    public List<Place> getByCountry(Long countryId) {
+        return placeRepository.findByCountryId(countryId);
     }
 
     public List<Place> getByCategory(Long categoryId) {
         return placeRepository.findByCategoryId(categoryId);
     }
 
-    public List<Place> getPublishedByDestination(Long destinationId) {
-        return placeRepository.findByDestinationIdAndIsPublishedTrue(destinationId);
+    public List<Place> getPublishedByCountry(Long countryId) {
+        return placeRepository.findByCountryIdAndIsPublishedTrue(countryId);
     }
 
     public List<Place> getFeatured() {
@@ -44,14 +46,19 @@ public class PlaceService {
 
     @Transactional
     public PlaceResponse createPlace(PlaceRequest placeRequest) {
-         Destination destination = destinationRepository.findById(placeRequest.getDestinationId())
-            .orElseThrow(() -> new RuntimeException("Destination not found with id: " + placeRequest.getDestinationId()));
+        Country country = countryRepository.findById(placeRequest.getCountryId())
+            .orElseThrow(() -> new RuntimeException(
+                "Country not found with id: " + placeRequest.getCountryId()
+            ));
 
         Category category = categoryRepository.findById(placeRequest.getCategoryId())
-            .orElseThrow(() -> new RuntimeException("Category not found with id: " + placeRequest.getCategoryId()));
+            .orElseThrow(() -> new RuntimeException(
+                "Category not found with id: " + placeRequest.getCategoryId()
+            ));
 
-        Place place = placeMapper.toEntity(placeRequest, destination, category);
+        Place place = placeMapper.toEntity(placeRequest, country, category);
         Place saved = placeRepository.save(place);
+
         return placeMapper.toResponse(saved);
     }
 

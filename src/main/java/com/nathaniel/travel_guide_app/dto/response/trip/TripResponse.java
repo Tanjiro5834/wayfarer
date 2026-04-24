@@ -15,11 +15,14 @@ import com.nathaniel.travel_guide_app.enums.TripStatus;
 public class TripResponse {
     private Long id;
     private Long userId;
-    private Long destinationId;
-    private String destinationName;
+    private Long countryId;
+    private String countryName;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Integer numberOfDays;
+    private Integer peopleCount;
+    private String representativeName;
     private BigDecimal totalBudget;
     private TravelStyle travelStyle;
     private TripStatus status;

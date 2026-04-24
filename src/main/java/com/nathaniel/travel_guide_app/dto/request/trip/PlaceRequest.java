@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class PlaceRequest {
-    private Long destinationId;
+    private Long countryId;
     private Long categoryId;
     private String name;
     private String description;

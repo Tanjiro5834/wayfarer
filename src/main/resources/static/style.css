@@ -1935,3 +1935,294 @@ img {
   background: rgba(232, 97, 74, 0.25);
   color: var(--primary-dark);
 }
+
+/* ============ TRAVEL PLANNER ============ */
+
+.planner-section {
+  background: var(--bg);
+}
+
+.planner-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.planner-subtitle {
+  color: var(--text-secondary);
+  margin-top: 12px;
+  max-width: 560px;
+}
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.trip-card,
+.itinerary-day-card,
+.activity-card {
+  background: var(--card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.trip-card {
+  padding: 24px;
+  transition: var(--transition);
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.trip-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.trip-meta {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+.trip-notes {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.trip-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.trip-status {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.planner-empty {
+  grid-column: 1 / -1;
+  background: var(--card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.planner-empty .empty-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.planner-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(10, 15, 30, 0.58);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.planner-modal-backdrop.hidden {
+  display: none;
+}
+
+.planner-modal {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: 32px;
+}
+
+.planner-modal-wide {
+  max-width: 900px;
+}
+
+.planner-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--border-light);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.planner-modal h2 {
+  font-family: var(--font-display);
+  color: var(--primary-dark);
+  margin-bottom: 20px;
+}
+
+.planner-step {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.planner-modal label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.planner-modal input,
+.planner-modal select,
+.planner-modal textarea {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--text-primary);
+  outline: none;
+  background: var(--card);
+}
+
+.planner-modal input:focus,
+.planner-modal select:focus,
+.planner-modal textarea:focus {
+  border-color: var(--accent);
+}
+
+.planner-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.planner-submit {
+  width: 100%;
+  margin-top: 22px;
+  padding: 13px 18px;
+}
+
+.itinerary-header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--text-primary));
+  color: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.itinerary-header h2 {
+  color: var(--card);
+  margin-bottom: 8px;
+}
+
+.itinerary-header p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.itinerary-days {
+  display: grid;
+  gap: 18px;
+}
+
+.itinerary-day-card {
+  padding: 22px;
+}
+
+.day-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.day-card-header h3 {
+  font-family: var(--font-display);
+  color: var(--primary-dark);
+}
+
+.day-date {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.activity-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.activity-card {
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.activity-card strong {
+  color: var(--primary-dark);
+}
+
+.activity-time {
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.activity-notes {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  margin-top: 4px;
+}
+
+.plan-trip-btn {
+  margin-left: 8px;
+}
+
+@media (max-width: 700px) {
+  .planner-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .planner-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-modal {
+    padding: 26px 20px;
+  }
+}

@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 public class PlaceResponse {
     private Long id;
-    private Long destinationId;
-    private String destinationName;
+    private Long countryId;        
+    private String countryName;  
     private Long categoryId;
     private String categoryName;
     private String name;

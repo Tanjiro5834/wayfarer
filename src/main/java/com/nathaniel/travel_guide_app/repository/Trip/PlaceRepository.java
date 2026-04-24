@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    List<Place> findByDestinationId(Long destinationId);
     List<Place> findByCategoryId(Long categoryId);
-    List<Place> findByDestinationIdAndIsPublishedTrue(Long destinationId);
     List<Place> findByIsFeaturedTrue();
     Optional<Place> findByName(String name);
+    List<Place> findByCountryId(Long countryId);
+    List<Place> findByCountryIdAndIsPublishedTrue(Long countryId);
 }

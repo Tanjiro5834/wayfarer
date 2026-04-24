@@ -27,8 +27,8 @@ public class Trip {
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "destination_id", nullable = false)
-    private Destination destination;
+    @JoinColumn(name = "country_id", nullable = false)
+    private Country country;
 
     @Column(nullable = false)
     private String title;
@@ -51,6 +51,13 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TripDay> tripDays = new ArrayList<>();
+
+    @Column(nullable = false)
+    private Integer numberOfDays;
+
+    private Integer peopleCount;
+
+    private String representativeName;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

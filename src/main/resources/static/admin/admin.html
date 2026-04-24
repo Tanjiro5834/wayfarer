@@ -1,167 +1,289 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Travi | Admin Page</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travi | Admin Page</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="admin.css" />
-</head>
-<body>
-  <div class="admin-shell">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">T</div>
-        <div class="brand-text">
-          <h1>Travi Admin</h1>
-          <p>Travel content operations</p>
-        </div>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-title">Overview</div>
-        <a href="#" class="nav-item active" data-section="dashboard">Dashboard</a>
-        <a href="#" class="nav-item" data-section="analytics">Analytics</a>
-        <a href="#" class="nav-item" data-section="users">Users</a>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-title">Content</div>
-        <a href="#" class="nav-item" data-section="countries">Countries</a>
-        <a href="#" class="nav-item" data-section="requirements">Entry Requirements</a>
-        <a href="#" class="nav-item" data-section="budgets">Budget Guides</a>
-        <a href="#" class="nav-item" data-section="packing">Packing Checklists</a>
-        <a href="#" class="nav-item" data-section="tips">Local Tips</a>
-        <a href="#" class="nav-item" data-section="culture">Culture Guides</a>
-      </div>
-
-      <div class="nav-group">
-        <div class="nav-title">System</div>
-        <a href="#" class="nav-item" data-section="drafts">Drafts</a>
-        <a href="#" class="nav-item" data-section="publish">Publish Queue</a>
-        <a href="#" class="nav-item" data-section="settings">Settings</a>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main">
-      <header class="topbar">
-        <div class="page-heading">
-          <h2 id="pageTitle">Editorial Command Center</h2>
-          <p id="pageSubtitle">
-            Manage destinations, keep travel data accurate, and publish updates with confidence.
-          </p>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">T</div>
+          <div class="brand-text">
+            <h1>Travi Admin</h1>
+            <p>Travel content operations</p>
+          </div>
         </div>
 
-        <div class="topbar-actions">
-          <input
-            id="searchInput"
-            class="search"
-            type="text"
-            placeholder="Search countries, drafts, requirements..."
-          />
-          <button class="btn btn-outline" id="exportBtn">Export</button>
-          <button class="btn btn-primary" id="addCountryBtn">+ Add Country</button>
+        <div class="nav-group">
+          <div class="nav-title">Overview</div>
+          <a href="#" class="nav-item active" data-section="dashboard"
+            >Dashboard</a
+          >
+          <a href="#" class="nav-item" data-section="analytics">Analytics</a>
+          <a href="#" class="nav-item" data-section="users">Users</a>
         </div>
-      </header>
 
-      <!-- =========================
+        <div class="nav-group">
+          <div class="nav-title">Content</div>
+          <a href="#" class="nav-item" data-section="countries">Countries</a>
+          <a href="#" class="nav-item" data-section="requirements"
+            >Entry Requirements</a
+          >
+          <a href="#" class="nav-item" data-section="budgets">Budget Guides</a>
+          <a href="#" class="nav-item" data-section="packing"
+            >Packing Checklists</a
+          >
+          <a href="#" class="nav-item" data-section="tips">Local Tips</a>
+          <a href="#" class="nav-item" data-section="culture">Culture Guides</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">System</div>
+          <a href="#" class="nav-item" data-section="drafts">Drafts</a>
+          <a href="#" class="nav-item" data-section="publish">Publish Queue</a>
+          <a href="#" class="nav-item" data-section="settings">Settings</a>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <header class="topbar">
+          <div class="page-heading">
+            <h2 id="pageTitle">Editorial Command Center</h2>
+            <p id="pageSubtitle">
+              Manage destinations, keep travel data accurate, and publish
+              updates with confidence.
+            </p>
+          </div>
+
+          <div class="topbar-actions">
+            <input
+              id="searchInput"
+              class="search"
+              type="text"
+              placeholder="Search countries, drafts, requirements..."
+            />
+            <button class="btn btn-outline" id="exportBtn">Export</button>
+            <button class="btn btn-primary" id="addCountryBtn">
+              + Add Country
+            </button>
+          </div>
+        </header>
+
+        <!-- =========================
            DASHBOARD SECTION
       ========================== -->
-      <section id="dashboardSection">
-        <!-- HERO -->
-        <section class="hero-panel">
-          <div>
-            <h3>Good afternoon, Admin.</h3>
-            <p>
-              You’re managing the live knowledge base behind Travi’s public destination pages:
-              country overviews, entry requirements, budgets, packing lists, local tips, and culture guidance.
-            </p>
+        <section id="dashboardSection">
+          <!-- HERO -->
+          <section class="hero-panel">
+            <div>
+              <h3>Good afternoon, Admin.</h3>
+              <p>
+                You’re managing the live knowledge base behind Travi’s public
+                destination pages: country overviews, entry requirements,
+                budgets, packing lists, local tips, and culture guidance.
+              </p>
 
-            <div class="quick-actions">
-              <button class="quick-chip">+ New country</button>
-              <button class="quick-chip">Update visa rules</button>
-              <button class="quick-chip">Publish budget changes</button>
-              <button class="quick-chip">Review missing fields</button>
-            </div>
-          </div>
-
-          <div class="hero-side">
-            <h4>Attention Needed</h4>
-
-            <div class="task-list">
-              <div class="task-item">
-                <div>
-                  <strong>Japan</strong>
-                  <small>Budget guide updated but not published</small>
-                </div>
-                <span class="badge badge-warning">Draft</span>
-              </div>
-
-              <div class="task-item">
-                <div>
-                  <strong>France</strong>
-                  <small>Entry requirement note missing insurance details</small>
-                </div>
-                <span class="badge badge-danger">Incomplete</span>
-              </div>
-
-              <div class="task-item">
-                <div>
-                  <strong>Singapore</strong>
-                  <small>Checklist and culture guide ready for release</small>
-                </div>
-                <span class="badge badge-success">Ready</span>
+              <div class="quick-actions">
+                <button class="quick-chip">+ New country</button>
+                <button class="quick-chip">Update visa rules</button>
+                <button class="quick-chip">Publish budget changes</button>
+                <button class="quick-chip">Review missing fields</button>
               </div>
             </div>
-          </div>
+
+            <div class="hero-side">
+              <h4>Attention Needed</h4>
+
+              <div class="task-list">
+                <div class="task-item">
+                  <div>
+                    <strong>Japan</strong>
+                    <small>Budget guide updated but not published</small>
+                  </div>
+                  <span class="badge badge-warning">Draft</span>
+                </div>
+
+                <div class="task-item">
+                  <div>
+                    <strong>France</strong>
+                    <small
+                      >Entry requirement note missing insurance details</small
+                    >
+                  </div>
+                  <span class="badge badge-danger">Incomplete</span>
+                </div>
+
+                <div class="task-item">
+                  <div>
+                    <strong>Singapore</strong>
+                    <small>Checklist and culture guide ready for release</small>
+                  </div>
+                  <span class="badge badge-success">Ready</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- KPI CARDS -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <span>Total Countries</span>
+              <h3 id="totalCountries">24</h3>
+              <p>3 added this month</p>
+            </div>
+
+            <div class="stat-card">
+              <span>Published Guides</span>
+              <h3 id="publishedGuides">116</h3>
+              <p>Across all content modules</p>
+            </div>
+
+            <div class="stat-card">
+              <span>Draft Updates</span>
+              <h3 id="draftUpdates">9</h3>
+              <p>Pending review before publish</p>
+            </div>
+
+            <div class="stat-card">
+              <span>Total Saves</span>
+              <h3 id="totalSaves">1,284</h3>
+              <p>Bookmarks from users</p>
+            </div>
+          </section>
+
+          <!-- DASHBOARD CONTENT GRID -->
+          <section class="content-grid">
+            <!-- COUNTRIES TABLE -->
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Countries</h3>
+                  <p>
+                    Manage public destination content and publishing status.
+                  </p>
+                </div>
+                <button class="btn btn-outline" id="viewAllCountriesBtn">
+                  View All
+                </button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Country</th>
+                      <th>Code</th>
+                      <th>Capital</th>
+                      <th>Last Updated</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="countryTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- RECENT ACTIVITY -->
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Recent Admin Activity</h3>
+                  <p>Latest content operations in the system.</p>
+                </div>
+              </div>
+
+              <div class="list" id="activityList"></div>
+            </div>
+          </section>
         </section>
 
-        <!-- KPI CARDS -->
-        <section class="stats-grid">
-          <div class="stat-card">
-            <span>Total Countries</span>
-            <h3 id="totalCountries">24</h3>
-            <p>3 added this month</p>
-          </div>
-
-          <div class="stat-card">
-            <span>Published Guides</span>
-            <h3 id="publishedGuides">116</h3>
-            <p>Across all content modules</p>
-          </div>
-
-          <div class="stat-card">
-            <span>Draft Updates</span>
-            <h3 id="draftUpdates">9</h3>
-            <p>Pending review before publish</p>
-          </div>
-
-          <div class="stat-card">
-            <span>Total Saves</span>
-            <h3 id="totalSaves">1,284</h3>
-            <p>Bookmarks from users</p>
-          </div>
-        </section>
-
-        <!-- DASHBOARD CONTENT GRID -->
-        <section class="content-grid">
-          <!-- COUNTRIES TABLE -->
+        <!-- =========================
+           ANALYTICS SECTION
+      ========================== -->
+        <section id="analyticsSection" style="display: none">
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h3>Countries</h3>
-                <p>Manage public destination content and publishing status.</p>
+                <h3>Analytics Overview</h3>
+                <p>Track engagement, saves, and destination performance.</p>
               </div>
-              <button class="btn btn-outline" id="viewAllCountriesBtn">View All</button>
             </div>
+
+            <div class="list" id="analyticsList">
+              <div class="list-item">
+                <div>
+                  <h4>Analytics module not connected yet</h4>
+                  <p>Add your analytics API and render charts/cards here.</p>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================
+           USERS SECTION
+      ========================== -->
+        <section id="usersSection" style="display: none">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>User Management</h3>
+                <p>Monitor travelers, saves, and account-level activity.</p>
+              </div>
+            </div>
+
+            <div class="list" id="usersList">
+              <div class="list-item">
+                <div>
+                  <h4>Users module not connected yet</h4>
+                  <p>
+                    Add your users API and render the user table or cards here.
+                  </p>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================
+           COUNTRIES SECTION
+      ========================== -->
+        <section id="countriesSection" style="display: none">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Country Management</h3>
+                <p>Create, update, and maintain destination records.</p>
+              </div>
+              <button class="btn btn-primary" id="countriesAddBtn">
+                + Add Country
+              </button>
+            </div>
+
+            <div
+              id="countriesRegionGrid"
+              class="content-grid"
+              style="margin-bottom: 20px"
+            ></div>
+            <div
+              id="countriesSubRegionGrid"
+              class="content-grid"
+              style="margin-bottom: 20px"
+            ></div>
 
             <div class="table-wrap">
               <table>
@@ -174,678 +296,921 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody id="countryTableBody"></tbody>
+                <tbody id="countriesSectionTableBody"></tbody>
               </table>
             </div>
           </div>
+        </section>
 
-          <!-- RECENT ACTIVITY -->
+        <!-- =========================
+           REQUIREMENTS SECTION
+      ========================== -->
+        <section id="requirementsSection" style="display: none">
+          <!-- Stats bar -->
+          <div class="section-stats">
+            <div class="section-stat">
+              <div class="section-stat-icon">🛂</div>
+              <div class="section-stat-text">
+                <span>Total Records</span>
+                <strong id="requirementsTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">✅</div>
+              <div class="section-stat-text">
+                <span>Published</span>
+                <strong id="requirementsPublishedCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">⚠️</div>
+              <div class="section-stat-text">
+                <span>Needs Review</span>
+                <strong id="requirementsNeedsReviewCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="section-toolbar">
+            <div class="section-toolbar-left">
+              <button class="filter-chip active">All</button>
+              <button class="filter-chip">Visa Required</button>
+              <button class="filter-chip">Visa-Free</button>
+              <button class="filter-chip">e-Visa</button>
+              <button class="filter-chip">Incomplete</button>
+            </div>
+            <button class="btn btn-primary" id="addEntryBtn">
+              + Add Entry Record
+            </button>
+          </div>
+
+          <!-- Cards -->
+          <div class="req-grid" id="requirementsGrid"></div>
+        </section>
+
+        <!-- =========================
+           BUDGETS SECTION
+      ========================== -->
+        <section id="budgetsSection" style="display: none">
+          <div class="section-stats">
+            <div class="section-stat">
+              <div class="section-stat-icon">💰</div>
+              <div class="section-stat-text">
+                <span>Budget Guides</span
+                ><strong id="budgetsTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">✅</div>
+              <div class="section-stat-text">
+                <span>Published</span
+                ><strong id="budgetsPublishedCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">📝</div>
+              <div class="section-stat-text">
+                <span>Drafts</span><strong id="budgetsDraftCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <div class="section-toolbar-left">
+              <button class="filter-chip active">All</button>
+              <button class="filter-chip">Budget</button>
+              <button class="filter-chip">Mid-Range</button>
+              <button class="filter-chip">Luxury</button>
+              <button class="filter-chip">Draft</button>
+            </div>
+            <button class="btn btn-primary" id="addBudgetBtn">
+              + Add Budget Guide
+            </button>
+          </div>
+
+          <div class="budget-grid" id="budgetsGrid"></div>
+        </section>
+
+        <!-- =========================
+           PACKING SECTION
+      ========================== -->
+        <section id="packingSection" style="display: none">
+          <div class="section-stats">
+            <div class="section-stat">
+              <div class="section-stat-icon">🎒</div>
+              <div class="section-stat-text">
+                <span>Checklists</span><strong id="packingTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">📦</div>
+              <div class="section-stat-text">
+                <span>Total Items</span
+                ><strong id="packingItemsCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">✅</div>
+              <div class="section-stat-text">
+                <span>Published</span
+                ><strong id="packingPublishedCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <div class="section-toolbar-left">
+              <button class="filter-chip active">All</button>
+              <button class="filter-chip">Tropical</button>
+              <button class="filter-chip">Cold Weather</button>
+              <button class="filter-chip">Beach</button>
+              <button class="filter-chip">Business</button>
+            </div>
+            <button class="btn btn-primary" id="addChecklistBtn">
+              + Add Checklist
+            </button>
+          </div>
+
+          <div class="packing-grid" id="packingGrid"></div>
+        </section>
+
+        <!-- =========================
+           TIPS SECTION
+      ========================== -->
+        <section id="tipsSection" style="display: none">
+          <div class="section-stats">
+            <div class="section-stat">
+              <div class="section-stat-icon">💡</div>
+              <div class="section-stat-text">
+                <span>Tip Collections</span
+                ><strong id="tipsTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">📌</div>
+              <div class="section-stat-text">
+                <span>Total Tips</span><strong id="tipsItemsCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">✅</div>
+              <div class="section-stat-text">
+                <span>Published</span><strong id="tipsPublishedCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <div class="section-toolbar-left">
+              <button class="filter-chip active">All</button>
+              <button class="filter-chip">Transport</button>
+              <button class="filter-chip">Safety</button>
+              <button class="filter-chip">Food</button>
+              <button class="filter-chip">Money</button>
+              <button class="filter-chip">Etiquette</button>
+            </div>
+            <button class="btn btn-primary" id="addTipsBtn">+ Add Tips</button>
+          </div>
+
+          <div class="tips-grid" id="tipsGrid"></div>
+        </section>
+
+        <!-- =========================
+           CULTURE SECTION
+      ========================== -->
+        <section id="cultureSection" style="display: none">
+          <div class="section-stats">
+            <div class="section-stat">
+              <div class="section-stat-icon">🎭</div>
+              <div class="section-stat-text">
+                <span>Culture Guides</span
+                ><strong id="cultureTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">✅</div>
+              <div class="section-stat-text">
+                <span>Published</span
+                ><strong id="culturePublishedCount">0</strong>
+              </div>
+            </div>
+            <div class="section-stat">
+              <div class="section-stat-icon">📝</div>
+              <div class="section-stat-text">
+                <span>Drafts</span><strong id="cultureDraftCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <div class="section-toolbar-left">
+              <button class="filter-chip active">All</button>
+              <button class="filter-chip">Religious</button>
+              <button class="filter-chip">Dining</button>
+              <button class="filter-chip">Greetings</button>
+              <button class="filter-chip">Dress Code</button>
+            </div>
+            <button class="btn btn-primary" id="addCultureBtn">
+              + Add Culture Guide
+            </button>
+          </div>
+
+          <div class="culture-grid" id="cultureGrid"></div>
+        </section>
+
+        <!-- =========================
+           DRAFTS SECTION
+      ========================== -->
+        <section id="draftsSection" style="display: none">
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h3>Recent Admin Activity</h3>
-                <p>Latest content operations in the system.</p>
+                <h3>Draft Management</h3>
+                <p>Review unpublished destination updates.</p>
               </div>
             </div>
 
-            <div class="list" id="activityList"></div>
+            <div class="list">
+              <div class="list-item">
+                <div>
+                  <h4>Drafts module not connected yet</h4>
+                  <p>Add your drafts API and renderer here.</p>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
+            </div>
           </div>
         </section>
-      </section>
 
-      <!-- =========================
-           ANALYTICS SECTION
-      ========================== -->
-      <section id="analyticsSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>Analytics Overview</h3>
-              <p>Track engagement, saves, and destination performance.</p>
-            </div>
-          </div>
-
-          <div class="list" id="analyticsList">
-            <div class="list-item">
-              <div>
-                <h4>Analytics module not connected yet</h4>
-                <p>
-                  Add your analytics API and render charts/cards here.
-                </p>
-              </div>
-              <span class="badge badge-warning">Pending</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================
-           USERS SECTION
-      ========================== -->
-      <section id="usersSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>User Management</h3>
-              <p>Monitor travelers, saves, and account-level activity.</p>
-            </div>
-          </div>
-
-          <div class="list" id="usersList">
-            <div class="list-item">
-              <div>
-                <h4>Users module not connected yet</h4>
-                <p>
-                  Add your users API and render the user table or cards here.
-                </p>
-              </div>
-              <span class="badge badge-warning">Pending</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================
-           COUNTRIES SECTION
-      ========================== -->
-      <section id="countriesSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>Country Management</h3>
-              <p>Create, update, and maintain destination records.</p>
-            </div>
-            <button class="btn btn-primary" id="countriesAddBtn">+ Add Country</button>
-          </div>
-
-          <div id="countriesRegionGrid" class="content-grid" style="margin-bottom:20px;"></div>
-          <div id="countriesSubRegionGrid" class="content-grid" style="margin-bottom:20px;"></div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Country</th>
-                  <th>Code</th>
-                  <th>Capital</th>
-                  <th>Last Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="countriesSectionTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================
-           REQUIREMENTS SECTION
-      ========================== -->
-      <section id="requirementsSection" style="display: none;">
-
-        <!-- Stats bar -->
-        <div class="section-stats">
-          <div class="section-stat">
-            <div class="section-stat-icon">🛂</div>
-            <div class="section-stat-text">
-              <span>Total Records</span>
-              <strong id="requirementsTotalCount">0</strong>
-            </div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">✅</div>
-            <div class="section-stat-text">
-              <span>Published</span>
-              <strong id="requirementsPublishedCount">0</strong>
-            </div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">⚠️</div>
-            <div class="section-stat-text">
-              <span>Needs Review</span>
-              <strong id="requirementsNeedsReviewCount">0</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Toolbar -->
-        <div class="section-toolbar">
-          <div class="section-toolbar-left">
-            <button class="filter-chip active">All</button>
-            <button class="filter-chip">Visa Required</button>
-            <button class="filter-chip">Visa-Free</button>
-            <button class="filter-chip">e-Visa</button>
-            <button class="filter-chip">Incomplete</button>
-          </div>
-          <button class="btn btn-primary" id="addEntryBtn">+ Add Entry Record</button>
-        </div>
-
-        <!-- Cards -->
-        <div class="req-grid" id="requirementsGrid"></div>
-      </section>
-
-      <!-- =========================
-           BUDGETS SECTION
-      ========================== -->
-      <section id="budgetsSection" style="display: none;">
-
-        <div class="section-stats">
-          <div class="section-stat">
-            <div class="section-stat-icon">💰</div>
-            <div class="section-stat-text"><span>Budget Guides</span><strong id="budgetsTotalCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">✅</div>
-            <div class="section-stat-text"><span>Published</span><strong id="budgetsPublishedCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">📝</div>
-            <div class="section-stat-text"><span>Drafts</span><strong id="budgetsDraftCount">0</strong></div>
-          </div>
-        </div>
-
-        <div class="section-toolbar">
-          <div class="section-toolbar-left">
-            <button class="filter-chip active">All</button>
-            <button class="filter-chip">Budget</button>
-            <button class="filter-chip">Mid-Range</button>
-            <button class="filter-chip">Luxury</button>
-            <button class="filter-chip">Draft</button>
-          </div>
-          <button class="btn btn-primary" id="addBudgetBtn">+ Add Budget Guide</button>
-        </div>
-
-        <div class="budget-grid" id="budgetsGrid"></div>
-      </section>
-
-      <!-- =========================
-           PACKING SECTION
-      ========================== -->
-      <section id="packingSection" style="display: none;">
-
-        <div class="section-stats">
-          <div class="section-stat">
-            <div class="section-stat-icon">🎒</div>
-            <div class="section-stat-text"><span>Checklists</span><strong id="packingTotalCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">📦</div>
-            <div class="section-stat-text"><span>Total Items</span><strong id="packingItemsCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">✅</div>
-            <div class="section-stat-text"><span>Published</span><strong id="packingPublishedCount">0</strong></div>
-          </div>
-        </div>
-
-        <div class="section-toolbar">
-          <div class="section-toolbar-left">
-            <button class="filter-chip active">All</button>
-            <button class="filter-chip">Tropical</button>
-            <button class="filter-chip">Cold Weather</button>
-            <button class="filter-chip">Beach</button>
-            <button class="filter-chip">Business</button>
-          </div>
-          <button class="btn btn-primary" id="addChecklistBtn">+ Add Checklist</button>
-        </div>
-
-        <div class="packing-grid" id="packingGrid"></div>
-      </section>
-
-      <!-- =========================
-           TIPS SECTION
-      ========================== -->
-      <section id="tipsSection" style="display: none;">
-
-        <div class="section-stats">
-          <div class="section-stat">
-            <div class="section-stat-icon">💡</div>
-            <div class="section-stat-text"><span>Tip Collections</span><strong id="tipsTotalCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">📌</div>
-            <div class="section-stat-text"><span>Total Tips</span><strong id="tipsItemsCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">✅</div>
-            <div class="section-stat-text"><span>Published</span><strong id="tipsPublishedCount">0</strong></div>
-          </div>
-        </div>
-
-        <div class="section-toolbar">
-          <div class="section-toolbar-left">
-            <button class="filter-chip active">All</button>
-            <button class="filter-chip">Transport</button>
-            <button class="filter-chip">Safety</button>
-            <button class="filter-chip">Food</button>
-            <button class="filter-chip">Money</button>
-            <button class="filter-chip">Etiquette</button>
-          </div>
-          <button class="btn btn-primary" id="addTipsBtn">+ Add Tips</button>
-        </div>
-
-        <div class="tips-grid" id="tipsGrid"></div>
-      </section>
-
-      <!-- =========================
-           CULTURE SECTION
-      ========================== -->
-      <section id="cultureSection" style="display: none;">
-
-        <div class="section-stats">
-          <div class="section-stat">
-            <div class="section-stat-icon">🎭</div>
-            <div class="section-stat-text"><span>Culture Guides</span><strong id="cultureTotalCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">✅</div>
-            <div class="section-stat-text"><span>Published</span><strong id="culturePublishedCount">0</strong></div>
-          </div>
-          <div class="section-stat">
-            <div class="section-stat-icon">📝</div>
-            <div class="section-stat-text"><span>Drafts</span><strong id="cultureDraftCount">0</strong></div>
-          </div>
-        </div>
-
-        <div class="section-toolbar">
-          <div class="section-toolbar-left">
-            <button class="filter-chip active">All</button>
-            <button class="filter-chip">Religious</button>
-            <button class="filter-chip">Dining</button>
-            <button class="filter-chip">Greetings</button>
-            <button class="filter-chip">Dress Code</button>
-          </div>
-          <button class="btn btn-primary" id="addCultureBtn">+ Add Culture Guide</button>
-        </div>
-
-        <div class="culture-grid" id="cultureGrid"></div>
-      </section>
-
-      <!-- =========================
-           DRAFTS SECTION
-      ========================== -->
-      <section id="draftsSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>Draft Management</h3>
-              <p>Review unpublished destination updates.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-item">
-              <div>
-                <h4>Drafts module not connected yet</h4>
-                <p>Add your drafts API and renderer here.</p>
-              </div>
-              <span class="badge badge-warning">Pending</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================
+        <!-- =========================
            PUBLISH SECTION
       ========================== -->
-      <section id="publishSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>Publish Queue</h3>
-              <p>Approve and release content updates.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-item">
+        <section id="publishSection" style="display: none">
+          <div class="panel">
+            <div class="panel-header">
               <div>
-                <h4>Publish queue module not connected yet</h4>
-                <p>Add your publish queue API and renderer here.</p>
+                <h3>Publish Queue</h3>
+                <p>Approve and release content updates.</p>
               </div>
-              <span class="badge badge-warning">Pending</span>
+            </div>
+
+            <div class="list">
+              <div class="list-item">
+                <div>
+                  <h4>Publish queue module not connected yet</h4>
+                  <p>Add your publish queue API and renderer here.</p>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- =========================
+        <!-- =========================
            SETTINGS SECTION
       ========================== -->
-      <section id="settingsSection" style="display: none;">
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <h3>System Settings</h3>
-              <p>Manage administrative preferences and controls.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-item">
+        <section id="settingsSection" style="display: none">
+          <div class="panel">
+            <div class="panel-header">
               <div>
-                <h4>Settings module not connected yet</h4>
-                <p>Add settings forms and backend endpoints here.</p>
+                <h3>System Settings</h3>
+                <p>Manage administrative preferences and controls.</p>
               </div>
-              <span class="badge badge-warning">Pending</span>
+            </div>
+
+            <div class="list">
+              <div class="list-item">
+                <div>
+                  <h4>Settings module not connected yet</h4>
+                  <p>Add settings forms and backend endpoints here.</p>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
-  </div>
+        </section>
+      </main>
+    </div>
 
-  <!-- ================================
+    <!-- ================================================================
+     TRIP MODAL — create / edit
+================================================================ -->
+    <div id="tripModal" class="modal-overlay" style="display: none">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="tripModalTitle">New Trip</h3>
+          <button class="modal-close" id="closeTripModal">×</button>
+        </div>
+        <form id="tripForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Trip Title *</label>
+              <input
+                type="text"
+                id="tripTitle"
+                placeholder="e.g. Cherry Blossom Japan 2025"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                id="tripDescription"
+                rows="3"
+                placeholder="What's this trip about?"
+              ></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Date *</label>
+                <input type="date" id="tripStartDate" required />
+              </div>
+              <div class="form-group">
+                <label>End Date *</label>
+                <input type="date" id="tripEndDate" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="tripStatus">
+                <option value="PLANNING">Planning</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="cancelTripModal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveTripBtn">
+              Save Trip
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================================================
+     ADD DAY MODAL
+================================================================ -->
+    <div id="dayModal" class="modal-overlay" style="display: none">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="dayModalTitle">Add Day</h3>
+          <button class="modal-close" id="closeDayModal">×</button>
+        </div>
+        <form id="dayForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Date *</label>
+              <input type="date" id="dayDate" required />
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea
+                id="dayNotes"
+                rows="3"
+                placeholder="Plans for this day..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="cancelDayModal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save Day</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================================================
+     ADD ACTIVITY MODAL
+================================================================ -->
+    <div id="activityModal" class="modal-overlay" style="display: none">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="activityModalTitle">Add Activity</h3>
+          <button class="modal-close" id="closeActivityModal">×</button>
+        </div>
+        <form id="activityForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Title *</label>
+              <input
+                type="text"
+                id="activityTitle"
+                placeholder="e.g. Visit Senso-ji Temple"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                id="activityDescription"
+                rows="2"
+                placeholder="Details..."
+              ></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" id="activityStartTime" />
+              </div>
+              <div class="form-group">
+                <label>End Time</label>
+                <input type="time" id="activityEndTime" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input
+                type="text"
+                id="activityLocation"
+                placeholder="e.g. Asakusa, Tokyo"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="cancelActivityModal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save Activity</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================
        MODAL: ADD ENTRY REQUIREMENT
   ================================= -->
-  <div id="entryModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="entryModalTitle">Add Entry Requirement</h3>
-        <button class="modal-close" id="closeEntryModal">×</button>
+    <div id="entryModal" class="modal-overlay" style="display: none">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="entryModalTitle">Add Entry Requirement</h3>
+          <button class="modal-close" id="closeEntryModal">×</button>
+        </div>
+        <form id="entryForm" autocomplete="off">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Country</label>
+                <select id="entryCountryId" required>
+                  <option value="">Select a country…</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Visa Type</label>
+                <select id="entryVisaType" required>
+                  <option value="">Select type…</option>
+                  <option value="VISA_FREE">Visa-Free</option>
+                  <option value="VISA_ON_ARRIVAL">Visa on Arrival</option>
+                  <option value="E_VISA">e-Visa</option>
+                  <option value="VISA_REQUIRED">Visa Required</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Max Stay (days)</label>
+                <input
+                  type="number"
+                  id="entryMaxStay"
+                  min="1"
+                  placeholder="90"
+                />
+              </div>
+              <div class="form-group">
+                <label>Passport Validity Required</label>
+                <input
+                  type="text"
+                  id="entryPassportValidity"
+                  placeholder="e.g. 6 months beyond stay"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Vaccination Requirements</label>
+              <input
+                type="text"
+                id="entryVaccination"
+                placeholder="e.g. Yellow Fever (if arriving from endemic country)"
+              />
+            </div>
+            <div class="form-group">
+              <label>Travel Insurance</label>
+              <select id="entryInsurance">
+                <option value="NOT_REQUIRED">Not Required</option>
+                <option value="RECOMMENDED">Recommended</option>
+                <option value="REQUIRED">Required</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Customs Notes</label>
+              <textarea
+                id="entryCustomsNotes"
+                rows="2"
+                placeholder="e.g. Declare all food items, strict drug penalties…"
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>Additional Notes</label>
+              <textarea
+                id="entryNotes"
+                rows="3"
+                placeholder="Any other entry information travelers should know…"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="cancelEntryModal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveEntryBtn">
+              Save Entry Record
+            </button>
+          </div>
+        </form>
       </div>
-      <form id="entryForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Country</label>
-              <select id="entryCountryId" required>
-                <option value="">Select a country…</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Visa Type</label>
-              <select id="entryVisaType" required>
-                <option value="">Select type…</option>
-                <option value="VISA_FREE">Visa-Free</option>
-                <option value="VISA_ON_ARRIVAL">Visa on Arrival</option>
-                <option value="E_VISA">e-Visa</option>
-                <option value="VISA_REQUIRED">Visa Required</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Max Stay (days)</label>
-              <input type="number" id="entryMaxStay" min="1" placeholder="90" />
-            </div>
-            <div class="form-group">
-              <label>Passport Validity Required</label>
-              <input type="text" id="entryPassportValidity" placeholder="e.g. 6 months beyond stay" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Vaccination Requirements</label>
-            <input type="text" id="entryVaccination" placeholder="e.g. Yellow Fever (if arriving from endemic country)" />
-          </div>
-          <div class="form-group">
-            <label>Travel Insurance</label>
-            <select id="entryInsurance">
-              <option value="NOT_REQUIRED">Not Required</option>
-              <option value="RECOMMENDED">Recommended</option>
-              <option value="REQUIRED">Required</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Customs Notes</label>
-            <textarea id="entryCustomsNotes" rows="2" placeholder="e.g. Declare all food items, strict drug penalties…"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Additional Notes</label>
-            <textarea id="entryNotes" rows="3" placeholder="Any other entry information travelers should know…"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelEntryModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveEntryBtn">Save Entry Record</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- ================================
+    <!-- ================================
        MODAL: ADD BUDGET GUIDE
   ================================= -->
-  <div id="budgetModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box modal-box-wide">
-      <div class="modal-header">
-        <h3 id="budgetModalTitle">Add Budget Guide</h3>
-        <button class="modal-close" id="closeBudgetModal">×</button>
-      </div>
-      <form id="budgetForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Country</label>
-            <select id="budgetCountryId" required>
-              <option value="">Select a country…</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Currency Used</label>
-            <input type="text" id="budgetCurrency" placeholder="e.g. JPY, USD, EUR" />
-          </div>
-
-          <div class="modal-section-label">💸 Budget Tier (per person/day)</div>
-          <div class="form-row form-row-3">
-            <div class="form-group">
-              <label>Accommodation</label>
-              <input type="text" id="budgetBudgetAccommodation" placeholder="$25–40" />
-            </div>
-            <div class="form-group">
-              <label>Food</label>
-              <input type="text" id="budgetBudgetFood" placeholder="$15–25" />
-            </div>
-            <div class="form-group">
-              <label>Transport</label>
-              <input type="text" id="budgetBudgetTransport" placeholder="$10–15" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Activities</label>
-              <input type="text" id="budgetBudgetActivities" placeholder="$5–10" />
-            </div>
-            <div class="form-group">
-              <label>Daily Total Range</label>
-              <input type="text" id="budgetBudgetTotal" placeholder="$55–90" />
-            </div>
-          </div>
-
-          <div class="modal-section-label">🏨 Mid-Range Tier (per person/day)</div>
-          <div class="form-row form-row-3">
-            <div class="form-group">
-              <label>Accommodation</label>
-              <input type="text" id="budgetMidAccommodation" placeholder="$80–130" />
-            </div>
-            <div class="form-group">
-              <label>Food</label>
-              <input type="text" id="budgetMidFood" placeholder="$30–50" />
-            </div>
-            <div class="form-group">
-              <label>Transport</label>
-              <input type="text" id="budgetMidTransport" placeholder="$20–30" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Activities</label>
-              <input type="text" id="budgetMidActivities" placeholder="$20–40" />
-            </div>
-            <div class="form-group">
-              <label>Daily Total Range</label>
-              <input type="text" id="budgetMidTotal" placeholder="$150–250" />
-            </div>
-          </div>
-
-          <div class="modal-section-label">✨ Luxury Tier (per person/day)</div>
-          <div class="form-row form-row-3">
-            <div class="form-group">
-              <label>Accommodation</label>
-              <input type="text" id="budgetLuxAccommodation" placeholder="$250+" />
-            </div>
-            <div class="form-group">
-              <label>Food</label>
-              <input type="text" id="budgetLuxFood" placeholder="$80+" />
-            </div>
-            <div class="form-group">
-              <label>Transport</label>
-              <input type="text" id="budgetLuxTransport" placeholder="$50+" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Activities</label>
-              <input type="text" id="budgetLuxActivities" placeholder="$100+" />
-            </div>
-            <div class="form-group">
-              <label>Daily Total Range</label>
-              <input type="text" id="budgetLuxTotal" placeholder="$480+" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Saving Tips</label>
-            <textarea id="budgetSavingTips" rows="3" placeholder="e.g. Use IC cards for transport, eat at convenience stores for cheap quality meals…"></textarea>
-          </div>
+    <div id="budgetModal" class="modal-overlay" style="display: none">
+      <div class="modal-box modal-box-wide">
+        <div class="modal-header">
+          <h3 id="budgetModalTitle">Add Budget Guide</h3>
+          <button class="modal-close" id="closeBudgetModal">×</button>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelBudgetModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveBudgetBtn">Save Budget Guide</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================================
-       MODAL: ADD PACKING CHECKLIST
-  ================================= -->
-  <div id="checklistModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box modal-box-wide">
-      <div class="modal-header">
-        <h3 id="checklistModalTitle">Add Packing Checklist</h3>
-        <button class="modal-close" id="closeChecklistModal">×</button>
-      </div>
-      <form id="checklistForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-row">
+        <form id="budgetForm" autocomplete="off">
+          <div class="modal-body">
             <div class="form-group">
               <label>Country</label>
-              <select id="checklistCountryId" required>
+              <select id="budgetCountryId" required>
                 <option value="">Select a country…</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Climate Type</label>
-              <select id="checklistClimate">
-                <option value="TROPICAL">Tropical</option>
-                <option value="TEMPERATE">Temperate</option>
-                <option value="COLD">Cold / Winter</option>
-                <option value="ARID">Arid / Desert</option>
-                <option value="MEDITERRANEAN">Mediterranean</option>
-              </select>
+              <label>Currency Used</label>
+              <input
+                type="text"
+                id="budgetCurrency"
+                placeholder="e.g. JPY, USD, EUR"
+              />
+            </div>
+
+            <div class="modal-section-label">
+              💸 Budget Tier (per person/day)
+            </div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label>Accommodation</label>
+                <input
+                  type="text"
+                  id="budgetBudgetAccommodation"
+                  placeholder="$25–40"
+                />
+              </div>
+              <div class="form-group">
+                <label>Food</label>
+                <input type="text" id="budgetBudgetFood" placeholder="$15–25" />
+              </div>
+              <div class="form-group">
+                <label>Transport</label>
+                <input
+                  type="text"
+                  id="budgetBudgetTransport"
+                  placeholder="$10–15"
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Activities</label>
+                <input
+                  type="text"
+                  id="budgetBudgetActivities"
+                  placeholder="$5–10"
+                />
+              </div>
+              <div class="form-group">
+                <label>Daily Total Range</label>
+                <input
+                  type="text"
+                  id="budgetBudgetTotal"
+                  placeholder="$55–90"
+                />
+              </div>
+            </div>
+
+            <div class="modal-section-label">
+              🏨 Mid-Range Tier (per person/day)
+            </div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label>Accommodation</label>
+                <input
+                  type="text"
+                  id="budgetMidAccommodation"
+                  placeholder="$80–130"
+                />
+              </div>
+              <div class="form-group">
+                <label>Food</label>
+                <input type="text" id="budgetMidFood" placeholder="$30–50" />
+              </div>
+              <div class="form-group">
+                <label>Transport</label>
+                <input
+                  type="text"
+                  id="budgetMidTransport"
+                  placeholder="$20–30"
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Activities</label>
+                <input
+                  type="text"
+                  id="budgetMidActivities"
+                  placeholder="$20–40"
+                />
+              </div>
+              <div class="form-group">
+                <label>Daily Total Range</label>
+                <input type="text" id="budgetMidTotal" placeholder="$150–250" />
+              </div>
+            </div>
+
+            <div class="modal-section-label">
+              ✨ Luxury Tier (per person/day)
+            </div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label>Accommodation</label>
+                <input
+                  type="text"
+                  id="budgetLuxAccommodation"
+                  placeholder="$250+"
+                />
+              </div>
+              <div class="form-group">
+                <label>Food</label>
+                <input type="text" id="budgetLuxFood" placeholder="$80+" />
+              </div>
+              <div class="form-group">
+                <label>Transport</label>
+                <input type="text" id="budgetLuxTransport" placeholder="$50+" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Activities</label>
+                <input
+                  type="text"
+                  id="budgetLuxActivities"
+                  placeholder="$100+"
+                />
+              </div>
+              <div class="form-group">
+                <label>Daily Total Range</label>
+                <input type="text" id="budgetLuxTotal" placeholder="$480+" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Saving Tips</label>
+              <textarea
+                id="budgetSavingTips"
+                rows="3"
+                placeholder="e.g. Use IC cards for transport, eat at convenience stores for cheap quality meals…"
+              ></textarea>
             </div>
           </div>
-
-          <div class="modal-section-label">📦 Checklist Items</div>
-          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Add items one at a time. Each item belongs to a category.</p>
-
-          <div id="checklistItemsContainer">
-            <!-- dynamic rows injected here -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="cancelBudgetModal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveBudgetBtn">
+              Save Budget Guide
+            </button>
           </div>
-
-          <button type="button" class="btn btn-outline" id="addChecklistItemRow" style="width:100%;margin-top:8px;">
-            + Add Item
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelChecklistModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveChecklistBtn">Save Checklist</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- ================================
+    <!-- ================================
+       MODAL: ADD PACKING CHECKLIST
+  ================================= -->
+    <div id="checklistModal" class="modal-overlay" style="display: none">
+      <div class="modal-box modal-box-wide">
+        <div class="modal-header">
+          <h3 id="checklistModalTitle">Add Packing Checklist</h3>
+          <button class="modal-close" id="closeChecklistModal">×</button>
+        </div>
+        <form id="checklistForm" autocomplete="off">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Country</label>
+                <select id="checklistCountryId" required>
+                  <option value="">Select a country…</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Climate Type</label>
+                <select id="checklistClimate">
+                  <option value="TROPICAL">Tropical</option>
+                  <option value="TEMPERATE">Temperate</option>
+                  <option value="COLD">Cold / Winter</option>
+                  <option value="ARID">Arid / Desert</option>
+                  <option value="MEDITERRANEAN">Mediterranean</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-section-label">📦 Checklist Items</div>
+            <p
+              style="
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                margin-bottom: 12px;
+              "
+            >
+              Add items one at a time. Each item belongs to a category.
+            </p>
+
+            <div id="checklistItemsContainer">
+              <!-- dynamic rows injected here -->
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="addChecklistItemRow"
+              style="width: 100%; margin-top: 8px"
+            >
+              + Add Item
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="cancelChecklistModal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveChecklistBtn">
+              Save Checklist
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================
        MODAL: ADD LOCAL TIPS
   ================================= -->
-  <div id="tipsModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box modal-box-wide">
-      <div class="modal-header">
-        <h3 id="tipsModalTitle">Add Local Tips</h3>
-        <button class="modal-close" id="closeTipsModal">×</button>
+    <div id="tipsModal" class="modal-overlay" style="display: none">
+      <div class="modal-box modal-box-wide">
+        <div class="modal-header">
+          <h3 id="tipsModalTitle">Add Local Tips</h3>
+          <button class="modal-close" id="closeTipsModal">×</button>
+        </div>
+        <form id="tipsForm" autocomplete="off">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Country</label>
+              <select id="tipsCountryId" required>
+                <option value="">Select a country…</option>
+              </select>
+            </div>
+
+            <div class="modal-section-label">💡 Tips</div>
+            <p
+              style="
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                margin-bottom: 12px;
+              "
+            >
+              Add practical tips for travelers. Each tip has a category and
+              icon.
+            </p>
+
+            <div id="tipsItemsContainer">
+              <!-- dynamic rows injected here -->
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="addTipItemRow"
+              style="width: 100%; margin-top: 8px"
+            >
+              + Add Tip
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="cancelTipsModal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveTipsBtn">
+              Save Tips
+            </button>
+          </div>
+        </form>
       </div>
-      <form id="tipsForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Country</label>
-            <select id="tipsCountryId" required>
-              <option value="">Select a country…</option>
-            </select>
-          </div>
-
-          <div class="modal-section-label">💡 Tips</div>
-          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Add practical tips for travelers. Each tip has a category and icon.</p>
-
-          <div id="tipsItemsContainer">
-            <!-- dynamic rows injected here -->
-          </div>
-
-          <button type="button" class="btn btn-outline" id="addTipItemRow" style="width:100%;margin-top:8px;">
-            + Add Tip
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelTipsModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveTipsBtn">Save Tips</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- ================================
+    <!-- ================================
        MODAL: ADD CULTURE GUIDE
   ================================= -->
-  <div id="cultureModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box modal-box-wide">
-      <div class="modal-header">
-        <h3 id="cultureModalTitle">Add Culture Guide</h3>
-        <button class="modal-close" id="closeCultureModal">×</button>
+    <div id="cultureModal" class="modal-overlay" style="display: none">
+      <div class="modal-box modal-box-wide">
+        <div class="modal-header">
+          <h3 id="cultureModalTitle">Add Culture Guide</h3>
+          <button class="modal-close" id="closeCultureModal">×</button>
+        </div>
+        <form id="cultureForm" autocomplete="off">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Country</label>
+              <select id="cultureCountryId" required>
+                <option value="">Select a country…</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <div class="modal-section-label" style="color: #065f46">
+                  ✅ Do's
+                </div>
+                <div id="dosContainer"></div>
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  id="addDoRow"
+                  style="width: 100%; margin-top: 8px; font-size: 0.82rem"
+                >
+                  + Add Do
+                </button>
+              </div>
+              <div>
+                <div class="modal-section-label" style="color: #991b1b">
+                  🚫 Don'ts
+                </div>
+                <div id="dontsContainer"></div>
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  id="addDontRow"
+                  style="width: 100%; margin-top: 8px; font-size: 0.82rem"
+                >
+                  + Add Don't
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 16px">
+              <label>Cultural Notes</label>
+              <textarea
+                id="cultureNotes"
+                rows="3"
+                placeholder="General cultural context and background for travelers…"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="cancelCultureModal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveCultureBtn">
+              Save Culture Guide
+            </button>
+          </div>
+        </form>
       </div>
-      <form id="cultureForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Country</label>
-            <select id="cultureCountryId" required>
-              <option value="">Select a country…</option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <div>
-              <div class="modal-section-label" style="color:#065f46;">✅ Do's</div>
-              <div id="dosContainer"></div>
-              <button type="button" class="btn btn-outline" id="addDoRow" style="width:100%;margin-top:8px;font-size:0.82rem;">+ Add Do</button>
-            </div>
-            <div>
-              <div class="modal-section-label" style="color:#991b1b;">🚫 Don'ts</div>
-              <div id="dontsContainer"></div>
-              <button type="button" class="btn btn-outline" id="addDontRow" style="width:100%;margin-top:8px;font-size:0.82rem;">+ Add Don't</button>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top:16px;">
-            <label>Cultural Notes</label>
-            <textarea id="cultureNotes" rows="3" placeholder="General cultural context and background for travelers…"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelCultureModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveCultureBtn">Save Culture Guide</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <script src="admin.js"></script>
-</body>
+    <script src="admin.js"></script>
+  </body>
 </html>

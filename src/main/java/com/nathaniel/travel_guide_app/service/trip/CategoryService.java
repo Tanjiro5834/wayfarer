@@ -19,11 +19,10 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     public List<CategoryResponse> getAllCategories() {
-        List<Category> categories = new ArrayList<>();
+        List<Category> categories = categoryRepository.findAll();
         List<CategoryResponse> categoryList = new ArrayList<>();
 
         for(Category category : categories){
-            categories.add(category);
             categoryList.add(categoryMapper.toResponse(category));
         }
 

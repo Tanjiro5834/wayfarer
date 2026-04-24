@@ -11,7 +11,7 @@ function getToken() {
   return localStorage.getItem("travi_token");
 }
 function setToken(token) {
-  localStorage.setItem("'travi_packing'", token);
+  localStorage.setItem("travi_token", token);
 }
 function clearToken() {
   localStorage.removeItem("travi_token");
@@ -177,6 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderSavedSection();
   initSearch();
   initHeroChips();
+  initPlanner();
 });
 
 // ============ LOAD COUNTRIES ============
@@ -1070,4 +1071,562 @@ async function renderSavedSection() {
     showToast("Could not load saved destinations.", "error");
     empty.style.display = "flex";
   }
+}
+
+// ============ TRAVEL PLANNER ============
+
+let currentPlannerTrip = null;
+let currentPlannerDays = [];
+let currentPlannerDestinationId = null;
+
+function initPlanner() {
+  const newTripBtn = $("newTripBtn");
+  const tripForm = $("tripForm");
+  const closeTripBtn = $("closeTripModal");
+  const closeItineraryBtn = $("closeItineraryModal");
+  const planTripBtn = $("planTripBtn");
+
+  if (newTripBtn) {
+    newTripBtn.addEventListener("click", () => openPlannerModal());
+  }
+
+  if (tripForm) {
+    tripForm.addEventListener("submit", handleCreatePlan);
+  }
+
+  if (closeTripBtn) {
+    closeTripBtn.addEventListener("click", closePlannerModal);
+  }
+
+  if (closeItineraryBtn) {
+    closeItineraryBtn.addEventListener("click", closeItineraryModal);
+  }
+
+  if (planTripBtn) {
+    planTripBtn.addEventListener("click", () => {
+      if (!currentCountryId) return;
+      openPlannerModal(currentCountryId);
+    });
+  }
+
+  ["tripModal", "itineraryModal"].forEach((modalId) => {
+    const modal = $(modalId);
+    if (!modal) return;
+
+    modal.addEventListener("click", (e) => {
+      if (e.target !== modal) return;
+
+      if (modalId === "tripModal") closePlannerModal();
+      if (modalId === "itineraryModal") closeItineraryModal();
+      if (modalId === "activityModal") closeActivityModal();
+    });
+  });
+
+  loadMyTrips();
+}
+
+function openPlannerModal(destinationId = null) {
+  // Dev mode: no sign-in required
+
+  populateTripDestinationSelect(destinationId);
+
+  const form = $("tripForm");
+  if (form) form.reset();
+
+  if (destinationId) {
+    $("tripDestinationId").value = String(destinationId);
+
+    const country = findCountry(destinationId);
+    if (country) {
+      $("tripTitle").value = `${country.name} Trip`;
+    }
+  }
+
+  $("tripModal").classList.remove("hidden");
+}
+
+function closePlannerModal() {
+  $("tripModal").classList.add("hidden");
+}
+
+function populateTripDestinationSelect(selectedId = null) {
+  const select = $("tripDestinationId");
+  if (!select) return;
+
+  select.innerHTML = countriesCache
+    .map(
+      (country) => `
+        <option value="${country.id}" ${Number(selectedId) === Number(country.id) ? "selected" : ""}>
+          ${country.flagEmoji || "🌍"} ${country.name}
+        </option>
+      `,
+    )
+    .join("");
+}
+
+async function handleCreatePlan(e) {
+  e.preventDefault();
+
+  const destinationId = Number($("tripDestinationId").value);
+  const numberOfDays = Number($("tripNumberOfDays").value);
+  const travelStyle = $("tripTravelStyle").value;
+  const peopleCount = Number($("tripPeopleCount").value || 1);
+  const representativeName = $("tripRepresentativeName").value.trim();
+  const notes = $("tripNotes").value.trim();
+
+  if (!destinationId || !numberOfDays) {
+    showToast("Please select a country and number of days.", "error");
+    return;
+  }
+
+  const country = findCountry(destinationId);
+
+  const payload = {
+    userId: 1, // temporary until login/register is finished
+    countryId: destinationId, // ✅ map here
+    title: `${country?.name || "Travel"} ${numberOfDays}-Day Trip`,
+    numberOfDays,
+    peopleCount,
+    representativeName,
+    travelStyle,
+    notes,
+  };
+
+  try {
+    const trip = await apiFetch("/trips/generate", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    closePlannerModal();
+    showToast("Trip plan generated!", "success");
+
+    await renderGeneratedPlan(trip);
+  } catch (err) {
+    console.error(err);
+    showToast("Could not generate trip plan.", "error");
+  }
+}
+
+async function renderGeneratedPlan(trip) {
+  const tripId = trip.id || trip.tripId;
+
+  if (!tripId) {
+    showToast("Generated trip has no ID.", "error");
+    return;
+  }
+
+  await openItinerary(tripId);
+}
+
+async function createMissingTripDays(tripId, startDate, numberOfDays) {
+  const start = new Date(`${startDate}T00:00:00`);
+
+  for (let i = 0; i < numberOfDays; i++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
+
+    await apiFetch("/trip-days", {
+      method: "POST",
+      body: JSON.stringify({
+        tripId,
+        dayNumber: i + 1,
+        date: toLocalDate(date),
+        notes: "",
+      }),
+    });
+  }
+}
+
+async function loadMyTrips() {
+  const grid = $("plannerTripsGrid");
+  if (!grid) return;
+
+  // if (!isLoggedIn()) {
+  //   renderPlannerEmptyState();
+  //   return;
+  // }
+
+  grid.innerHTML = `
+    <div class="planner-empty">
+      <div class="empty-icon">✈</div>
+      <p>Loading your trips...</p>
+    </div>
+  `;
+
+  try {
+    const trips = await apiFetch("/trips/user/1"); // temporary until login is implemented
+    renderPlannerTrips(Array.isArray(trips) ? trips : []);
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = `
+      <div class="planner-empty">
+        <div class="empty-icon">!</div>
+        <p>Could not load your trips.</p>
+      </div>
+    `;
+  }
+}
+
+function renderPlannerTrips(trips) {
+  const grid = $("plannerTripsGrid");
+  if (!grid) return;
+
+  if (!trips.length) {
+    grid.innerHTML = `
+      <div class="planner-empty">
+        <div class="empty-icon">✈</div>
+        <p>No trips yet.<br/>Create your first travel plan.</p>
+        <button class="btn-primary-sm" onclick="openPlannerModal()">+ New Trip</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = trips
+    .map((trip) => {
+      const destination = getTripDestinationName(trip);
+      const range = formatTripRange(trip.startDate, trip.endDate);
+      const notes = trip.notes || "No notes yet.";
+
+      return `
+        <article class="trip-card">
+          <span class="trip-status">${trip.status || "Planning"}</span>
+          <h3>${escapeText(trip.title || "Untitled Trip")}</h3>
+          <div class="trip-meta">${escapeText(destination)} · ${range}</div>
+          <p class="trip-notes">${escapeText(notes)}</p>
+
+          <div class="trip-actions">
+            <button class="btn-primary-sm" onclick="openItinerary(${trip.id})">View Plan</button>
+            <button class="btn-outline-sm" onclick="deleteTrip(${trip.id})">Delete</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderPlannerEmptyState() {
+  const grid = $("plannerTripsGrid");
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <div class="planner-empty">
+      <div class="empty-icon">✦</div>
+      <p>Sign in to create and manage your travel plans.</p>
+      <button class="btn-outline-sm" onclick="openAuthModal('login')">Sign In</button>
+    </div>
+  `;
+}
+
+async function openItinerary(tripId) {
+  try {
+    const [trip, days] = await Promise.all([
+      apiFetch(`/trips/${tripId}`),
+      apiFetch(`/trip-days/trip/${tripId}`).catch(() => []),
+    ]);
+
+    currentPlannerTrip = trip;
+    currentPlannerDays = Array.isArray(days) ? days : [];
+    currentPlannerDestinationId = trip.destinationId || trip.destination?.id;
+
+    renderItinerary(trip, currentPlannerDays);
+    $("itineraryModal").classList.remove("hidden");
+  } catch (err) {
+    console.error(err);
+    showToast("Could not open itinerary.", "error");
+  }
+}
+
+function closeItineraryModal() {
+  $("itineraryModal").classList.add("hidden");
+}
+
+function renderItinerary(trip, days = []) {
+  const content = $("itineraryContent");
+  if (!content) return;
+
+  const destinationName = getTripDestinationName(trip);
+  const range = formatTripRange(trip.startDate, trip.endDate);
+
+  content.innerHTML = `
+    <div class="itinerary-header">
+      <span class="trip-status">${trip.status || "Planning"}</span>
+      <h2>${escapeText(trip.title || "Untitled Trip")}</h2>
+      <p>${escapeText(destinationName)} · ${range}</p>
+      ${trip.notes ? `<p style="margin-top:10px">${escapeText(trip.notes)}</p>` : ""}
+    </div>
+
+    <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:18px;">
+      <h3 style="font-family:var(--font-display); color:var(--primary-dark);">Itinerary</h3>
+      
+    </div>
+
+    <div class="itinerary-days">
+      ${
+        days.length
+          ? days
+              .sort((a, b) => Number(a.dayNumber) - Number(b.dayNumber))
+              .map(renderItineraryDay)
+              .join("")
+          : `
+            <div class="planner-empty">
+              <div class="empty-icon">☀</div>
+              <p>No days yet.</p>
+              <button class="btn-primary-sm" onclick="handleAddDay()">+ Add Day</button>
+            </div>
+          `
+      }
+    </div>
+  `;
+}
+
+function renderItineraryDay(day) {
+  const activities = Array.isArray(day.activities) ? day.activities : [];
+
+  return `
+    <article class="itinerary-day-card">
+      <div class="day-card-header">
+        <div>
+          <h3>Day ${day.dayNumber}</h3>
+          <div class="day-date">${formatDateText(day.date)}</div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="trip-status">Generated</span>
+        </div>
+      </div>
+
+      ${day.notes ? `<p class="trip-notes">${escapeText(day.notes)}</p>` : ""}
+
+      <div class="activity-list">
+        ${
+          activities.length
+            ? activities
+                .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+                .map(renderActivityCard)
+                .join("")
+            : `<p class="trip-notes">No activities yet.</p>`
+        }
+      </div>
+    </article>
+  `;
+}
+
+function renderActivityCard(activity) {
+  const placeName =
+    activity.placeName ||
+    activity.place?.name ||
+    "Selected place";
+
+  return `
+    <div class="activity-card">
+      <div class="activity-time">
+        ${activity.startTime || "—"} - ${activity.endTime || "—"}
+      </div>
+
+      <strong>${escapeText(placeName)}</strong>
+
+      ${
+        activity.notes
+          ? `<div class="activity-notes">${escapeText(activity.notes)}</div>`
+          : ""
+      }
+
+      <div style="margin-top:10px;">
+        <button class="btn-outline-sm" onclick="deleteTripActivity(${activity.id})">Delete</button>
+      </div>
+    </div>
+  `;
+}
+
+async function handleAddDay() {
+  if (!currentPlannerTrip) return;
+
+  const nextDayNumber = currentPlannerDays.length + 1;
+  const baseDate = new Date(`${currentPlannerTrip.startDate}T00:00:00`);
+  baseDate.setDate(baseDate.getDate() + nextDayNumber - 1);
+
+  try {
+    await apiFetch("/trip-days", {
+      method: "POST",
+      body: JSON.stringify({
+        tripId: currentPlannerTrip.id,
+        dayNumber: nextDayNumber,
+        date: toLocalDate(baseDate),
+        notes: "",
+      }),
+    });
+
+    showToast("Day added.", "success");
+    await openItinerary(currentPlannerTrip.id);
+  } catch (err) {
+    console.error(err);
+    showToast("Could not add day.", "error");
+  }
+}
+
+async function openActivityModal(tripDayId) {
+  $("activityTripDayId").value = tripDayId;
+  $("activityForm").reset();
+  $("activityTripDayId").value = tripDayId;
+
+  await populateActivityPlaces();
+
+  $("activityModal").classList.remove("hidden");
+}
+
+function closeActivityModal() {
+  $("activityModal").classList.add("hidden");
+}
+
+async function populateActivityPlaces() {
+  const select = $("activityPlaceId");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Loading places...</option>`;
+
+  try {
+    const destinationId =
+      currentPlannerDestinationId ||
+      currentPlannerTrip?.destinationId ||
+      currentPlannerTrip?.destination?.id;
+
+    const places = await apiFetch(`/places/destination/${destinationId}`);
+
+    select.innerHTML = places.length
+      ? places
+          .map(
+            (place) => `
+              <option value="${place.id}">
+                ${place.name}
+              </option>
+            `,
+          )
+          .join("")
+      : `<option value="">No places available</option>`;
+  } catch (err) {
+    console.error(err);
+    select.innerHTML = `<option value="">Could not load places</option>`;
+  }
+}
+
+async function handleCreateActivity(e) {
+  e.preventDefault();
+
+  const payload = {
+    tripDayId: Number($("activityTripDayId").value),
+    placeId: Number($("activityPlaceId").value),
+    startTime: $("activityStartTime").value,
+    endTime: $("activityEndTime").value,
+    notes: $("activityNotes").value.trim(),
+  };
+
+  if (!payload.tripDayId || !payload.placeId || !payload.startTime || !payload.endTime) {
+    showToast("Please complete the activity form.", "error");
+    return;
+  }
+
+  try {
+    await apiFetch("/trip-activities", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    closeActivityModal();
+    showToast("Activity added.", "success");
+
+    if (currentPlannerTrip?.id) {
+      await openItinerary(currentPlannerTrip.id);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Could not add activity.", "error");
+  }
+}
+
+async function deleteTrip(tripId) {
+  if (!confirm("Delete this trip?")) return;
+
+  try {
+    await apiFetch(`/trips/${tripId}`, { method: "DELETE" });
+    showToast("Trip deleted.");
+    await loadMyTrips();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not delete trip.", "error");
+  }
+}
+
+async function deleteTripDay(dayId) {
+  if (!confirm("Delete this day?")) return;
+
+  try {
+    await apiFetch(`/trip-days/${dayId}`, { method: "DELETE" });
+    showToast("Day deleted.");
+
+    if (currentPlannerTrip?.id) {
+      await openItinerary(currentPlannerTrip.id);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Could not delete day.", "error");
+  }
+}
+
+async function deleteTripActivity(activityId) {
+  if (!confirm("Delete this activity?")) return;
+
+  try {
+    await apiFetch(`/trip-activities/${activityId}`, { method: "DELETE" });
+    showToast("Activity deleted.");
+
+    if (currentPlannerTrip?.id) {
+      await openItinerary(currentPlannerTrip.id);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Could not delete activity.", "error");
+  }
+}
+
+function findCountry(id) {
+  return countriesCache.find((country) => Number(country.id) === Number(id));
+}
+
+function getTripDestinationName(trip) {
+  if (trip.destinationName) return trip.destinationName;
+  if (trip.destination?.name) return trip.destination.name;
+
+  const destinationId = trip.destinationId || trip.destination?.id;
+  const country = findCountry(destinationId);
+
+  return country?.name || "Unknown destination";
+}
+
+function formatTripRange(startDate, endDate) {
+  if (!startDate && !endDate) return "No dates yet";
+  if (startDate && !endDate) return formatDateText(startDate);
+  return `${formatDateText(startDate)} – ${formatDateText(endDate)}`;
+}
+
+function formatDateText(value) {
+  if (!value) return "No date";
+
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function toLocalDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function escapeText(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }

@@ -177,6 +177,7 @@ async function bootstrapAdminPage() {
       loadCulture().catch((err) => {
         console.warn("Culture load skipped:", err.message);
       }),
+      loadTrips().catch(err => console.warn("Trips load skipped:", err.message))
     ]);
   } catch (err) {
     handleBootstrapError(err);
@@ -909,6 +910,7 @@ function initNav() {
     drafts: "draftsSection",
     publish: "publishSection",
     settings: "settingsSection",
+    planner: "plannerSection",
   };
 
   navItems.forEach((item) => {
@@ -961,6 +963,7 @@ function showSection(activeSectionId) {
     "draftsSection",
     "publishSection",
     "settingsSection",
+    "plannerSection",
   ];
 
   allSections.forEach((id) => {

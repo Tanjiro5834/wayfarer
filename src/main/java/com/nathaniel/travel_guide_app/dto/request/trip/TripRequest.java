@@ -12,12 +12,16 @@ import com.nathaniel.travel_guide_app.enums.TripStatus;
 @Setter
 public class TripRequest {
     private Long userId;
-    private Long destinationId;
+    private Long countryId;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Integer numberOfDays;          // ✅ NEW
+    private Integer peopleCount;           // ✅ NEW
+    private String representativeName;   // ✅ NEW
     private BigDecimal totalBudget;
     private TravelStyle travelStyle;
     private TripStatus status;
     private String notes;
+
 }
