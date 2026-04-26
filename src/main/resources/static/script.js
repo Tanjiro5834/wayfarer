@@ -28,19 +28,29 @@ async function apiFetch(path, options = {}) {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-
-  if (res.status === 401) {
-    clearToken();
-    updateAuthUI();
-    throw new Error("Unauthorized");
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
+
+  const res = await fetch(`${API_BASE}${path}`, { 
+    ...options, 
+    headers 
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    clearToken();
+    localStorage.removeItem("travi_user");
+    updateAuthUI();
+    // Don't throw immediately, let the caller handle it
+    throw new Error("Unauthorized - Please log in again");
+  }
+  
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(text || res.statusText);
   }
+  
   if (res.status === 204) return null;
   return res.json();
 }
@@ -1088,8 +1098,9 @@ async function toggleSave(countryId) {
     showToast("Please sign in to save destinations.");
     return;
   }
-  const isSaved = await checkIfSaved(countryId);
+  
   try {
+    const isSaved = await checkIfSaved(countryId);
     if (isSaved) {
       await apiFetch(`/saved-destinations/${countryId}`, { method: "DELETE" });
       showToast("Removed from saved.");
@@ -1098,9 +1109,15 @@ async function toggleSave(countryId) {
       showToast("Destination saved!", "success");
     }
     updateSaveBtn();
-    renderSavedSection();
+    await renderSavedSection();
   } catch (err) {
-    showToast("Could not update saved destinations.", "error");
+    console.error("Error toggling save:", err);
+    if (err.message.includes("Unauthorized")) {
+      openAuthModal("login");
+      showToast("Please sign in again.", "error");
+    } else {
+      showToast("Could not update saved destinations.", "error");
+    }
   }
 }
 
@@ -1128,6 +1145,8 @@ async function updateSaveBtn() {
 async function renderSavedSection() {
   const grid = $("savedGrid");
   const empty = $("savedEmpty");
+  
+  // Clear existing cards
   grid.querySelectorAll(".saved-card").forEach((c) => c.remove());
 
   if (!isLoggedIn()) {
@@ -1137,10 +1156,10 @@ async function renderSavedSection() {
       <p>Sign in to see your saved destinations.</p>
       <button class="btn-outline-sm btn-sign-in">Sign In</button>
     `;
-    // rewire the sign-in button rendered inside the empty state
     const signInBtn = empty.querySelector(".btn-sign-in");
-    if (signInBtn)
+    if (signInBtn) {
       signInBtn.addEventListener("click", () => openAuthModal("login"));
+    }
     return;
   }
 
@@ -1158,13 +1177,11 @@ async function renderSavedSection() {
 
     empty.style.display = "none";
     saved.forEach((s) => {
-      // SavedDestinationResponse: { id, countryId, countryName, countryFlag, countryRegion, countryGradient, ... }
       const id = s.countryId || s.country?.id;
       const name = s.countryName || s.country?.name || "Unknown";
       const flag = s.countryFlag || s.country?.flagEmoji || "🌍";
       const region = s.countryRegion || s.country?.region || "";
-      const gradient =
-        s.countryGradient || s.country?.gradientCss || defaultGradient(0);
+      const gradient = s.countryGradient || s.country?.gradientCss || defaultGradient(0);
 
       const card = el("div", "saved-card");
       card.innerHTML = `
@@ -1181,23 +1198,33 @@ async function renderSavedSection() {
           <button class="saved-remove-btn" title="Remove">✕</button>
         </div>
       `;
-      card
-        .querySelector(".saved-card-img")
-        .addEventListener("click", () => id && openCountry(id));
-      card
-        .querySelector(".saved-card-name")
-        .parentElement.addEventListener("click", () => id && openCountry(id));
-      card
-        .querySelector(".saved-remove-btn")
-        .addEventListener("click", async (e) => {
-          e.stopPropagation();
-          await toggleSave(id);
-        });
+      
+      card.querySelector(".saved-card-img").addEventListener("click", () => id && openCountry(id));
+      card.querySelector(".saved-card-name").parentElement.addEventListener("click", () => id && openCountry(id));
+      card.querySelector(".saved-remove-btn").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        await toggleSave(id);
+      });
       grid.appendChild(card);
     });
   } catch (err) {
-    showToast("Could not load saved destinations.", "error");
-    empty.style.display = "flex";
+    console.error("Error loading saved destinations:", err);
+    if (err.message.includes("Unauthorized")) {
+      // User is not authenticated, show login prompt
+      empty.style.display = "flex";
+      empty.innerHTML = `
+        <div class="empty-icon">✦</div>
+        <p>Session expired. Please sign in again.</p>
+        <button class="btn-outline-sm btn-sign-in">Sign In</button>
+      `;
+      const signInBtn = empty.querySelector(".btn-sign-in");
+      if (signInBtn) {
+        signInBtn.addEventListener("click", () => openAuthModal("login"));
+      }
+    } else {
+      showToast("Could not load saved destinations.", "error");
+      empty.style.display = "flex";
+    }
   }
 }
 
