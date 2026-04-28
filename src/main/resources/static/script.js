@@ -38,12 +38,18 @@ async function apiFetch(path, options = {}) {
     headers 
   });
 
-  if (res.status === 401 || res.status === 403) {
+  // Only clear token for 401 Unauthorized, not 403 Forbidden
+  if (res.status === 401) {
     clearToken();
     localStorage.removeItem("travi_user");
     updateAuthUI();
-    // Don't throw immediately, let the caller handle it
     throw new Error("Unauthorized - Please log in again");
+  }
+  
+  // For 403, just throw the error without clearing token
+  if (res.status === 403) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`Forbidden: ${text || res.statusText}`);
   }
   
   if (!res.ok) {
@@ -101,96 +107,33 @@ function updateAuthUI() {
   logoutBtns.forEach((b) => (b.style.display = loggedIn ? "" : "none"));
 }
 
+// ── Redirect to authentication page instead of modal ──────
 function openAuthModal(mode = "login") {
-  const modal = $("authModal");
-  if (!modal) return;
-  modal.classList.remove("hidden");
-  switchAuthMode(mode);
+  // Save the current scroll position so we can restore it on return
+  sessionStorage.setItem("travi_auth_return", window.location.href);
+  window.location.href = `authentication.html?mode=${mode}`;
 }
 
 function closeAuthModal() {
-  const modal = $("authModal");
-  if (modal) modal.classList.add("hidden");
+  // No-op: kept for compatibility. Auth now lives on its own page.
 }
 
 function switchAuthMode(mode) {
-  const loginForm = $("loginForm");
-  const registerForm = $("registerForm");
-  if (!loginForm || !registerForm) return;
-  if (mode === "login") {
-    loginForm.style.display = "";
-    registerForm.style.display = "none";
-  } else {
-    loginForm.style.display = "none";
-    registerForm.style.display = "";
-  }
+  // No-op: kept for compatibility.
+  openAuthModal(mode);
 }
 
 async function handleLogin(e) {
-  e.preventDefault();
-  const username = $("loginUsername").value.trim();
-  const password = $("loginPassword").value;
-  if (!username || !password)
-    return showToast("Please fill in all fields.", "error");
-  try {
-    const data = await apiFetch("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ username, password }),
-    });
-    
-    // Backend returns: { token, id, username, email, role }
-    setToken(data.token);
-    
-    // Store user info from the root level, not from data.user
-    const userInfo = {
-      id: data.id,
-      username: data.username,
-      email: data.email,
-      role: data.role
-    };
-    localStorage.setItem("travi_user", JSON.stringify(userInfo));
-    
-    updateAuthUI();
-    closeAuthModal();
-    showToast("Welcome back!", "success");
-    
-    // Refresh saved destinations and trips
-    await renderSavedSection();
-    await loadMyTrips();
-  } catch (err) {
-    showToast("Login failed. Check your credentials.", "error");
-  }
+  // Login is now handled in authentication.html / authentication.js
+  // This stub is kept for backward compatibility with any inline modal usage.
+  e && e.preventDefault();
+  openAuthModal("login");
 }
 
 async function handleRegister(e) {
-  e.preventDefault();
-  const username = $("regUsername").value.trim();
-  const email = $("regEmail").value.trim();
-  const password = $("regPassword").value;
-  if (!username || !email || !password)
-    return showToast("Please fill in all fields.", "error");
-  try {
-    const data = await apiFetch("/auth/register", {
-      method: "POST",
-      body: JSON.stringify({ username, email, password }),
-    });
-    // data = { token, user: { id, username, email, role } }
-    setToken(data.token);
-    
-    if (data.user) {
-      localStorage.setItem("travi_user", JSON.stringify(data.user));
-    }
-    
-    updateAuthUI();
-    closeAuthModal();
-    showToast("Account created! Welcome!", "success");
-    
-    // Refresh UI
-    await renderSavedSection();
-    await loadMyTrips();
-  } catch (err) {
-    showToast("Registration failed. Try a different username/email.", "error");
-  }
+  // Register is now handled in authentication.html / authentication.js
+  e && e.preventDefault();
+  openAuthModal("register");
 }
 
 function handleLogout() {
@@ -253,22 +196,133 @@ function updateAuthUI() {
   }
 }
 
-// ============ INIT ============
+// ============ AUTH REDIRECT PROMPT ============
+// Shows a branded in-page overlay nudge instead of a jarring redirect.
+function promptAuthRedirect(mode = "login", action = "") {
+  // Remove any existing prompt
+  const existing = document.getElementById("authPromptOverlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "authPromptOverlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; z-index:3000;
+    background:rgba(30,42,50,0.72);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    animation: authPromptIn .25s cubic-bezier(.4,0,.2,1) both;
+  `;
+
+  const card = document.createElement("div");
+  card.style.cssText = `
+    background:#fff;
+    border-radius:20px;
+    padding:36px 32px;
+    max-width:400px; width:100%;
+    text-align:center;
+    box-shadow:0 32px 80px rgba(0,0,0,0.35);
+    animation: authCardIn .35s cubic-bezier(.34,1.56,.64,1) .05s both;
+  `;
+
+  const actionText = action ? `<p style="font-size:.88rem;color:#8fa3b0;margin-bottom:24px;line-height:1.5;">
+    To <strong>${action}</strong>, you need to be signed in.
+  </p>` : "";
+
+  card.innerHTML = `
+    <div style="font-size:2.2rem;margin-bottom:12px;">✈️</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.55rem;color:#1E2A32;margin-bottom:8px;">
+      Sign in to continue
+    </h2>
+    ${actionText}
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <a href="authentication.html?mode=${mode}"
+         style="display:block;padding:13px;background:linear-gradient(135deg,#FF7E5F,#e8613a);
+                color:#fff;border-radius:100px;font-weight:700;font-size:.95rem;
+                font-family:'DM Sans',sans-serif;
+                box-shadow:0 4px 18px rgba(255,126,95,.38);
+                transition:all .22s ease;text-decoration:none;">
+        Sign In
+      </a>
+      <a href="authentication.html?mode=register"
+         style="display:block;padding:12px;border:1.5px solid #dde4e8;color:#1E2A32;
+                border-radius:100px;font-weight:500;font-size:.9rem;
+                font-family:'DM Sans',sans-serif;
+                transition:all .22s ease;text-decoration:none;">
+        Create an Account
+      </a>
+      <button onclick="document.getElementById('authPromptOverlay').remove()"
+              style="background:none;border:none;color:#8fa3b0;font-size:.85rem;
+                     cursor:pointer;font-family:'DM Sans',sans-serif;
+                     padding:4px;transition:color .18s ease;">
+        Continue as guest
+      </button>
+    </div>
+  `;
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  // Close on backdrop click
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  // Inject keyframes once
+  if (!document.getElementById("authPromptStyles")) {
+    const st = document.createElement("style");
+    st.id = "authPromptStyles";
+    st.textContent = `
+      @keyframes authPromptIn { from{opacity:0} to{opacity:1} }
+      @keyframes authCardIn   { from{opacity:0;transform:translateY(24px) scale(.96)} to{opacity:1;transform:none} }
+    `;
+    document.head.appendChild(st);
+  }
+}
+
+// ============ WELCOME BACK TOAST (on return from auth page) ============
+function maybeShowWelcomeBack() {
+  const flag = sessionStorage.getItem("travi_just_logged_in");
+  if (flag) {
+    sessionStorage.removeItem("travi_just_logged_in");
+    const user = getCurrentUser();
+    const name = user ? user.username : "traveler";
+    showToast(`Welcome back, ${name}! 🌍`, "success");
+  }
+}
 document.addEventListener("DOMContentLoaded", async () => {
   initNavbar();
   initHamburger();
   initAuthModal();
 
-  await verifyCurrentUser();
+  // ── DIAGNOSTIC: token state on page load ──
+  console.group("🛫 Travi boot");
+  console.log("token in localStorage:", localStorage.getItem("travi_token") ? "✅ present" : "❌ missing");
+  console.log("user  in localStorage:", localStorage.getItem("travi_user")  ? "✅ present" : "❌ missing");
+
+  const verifiedUser = await verifyCurrentUser();
+  console.log("verifyCurrentUser() =>", verifiedUser
+    ? ("✅ " + verifiedUser.username + " (id=" + verifiedUser.id + ")")
+    : "❌ null — token invalid or missing");
+
   updateAuthUI();
+  maybeShowWelcomeBack();
+
   await loadCountries();
+  console.log("countries loaded:", countriesCache.length);
 
   renderDestinationsGrid();
-  renderSavedSection();
-  initSearch();
 
+  console.log("renderSavedSection — isLoggedIn():", isLoggedIn());
+  await renderSavedSection();
+
+  initSearch();
   initHeroChips();
-  initPlanner();
+
+  console.log("initPlanner — getCurrentUser():", getCurrentUser());
+  await initPlanner();
+
+  console.groupEnd();
 });
 
 // ============ LOAD COUNTRIES ============
@@ -340,7 +394,7 @@ function initHamburger() {
 
 // ============ AUTH MODAL INIT ============
 function initAuthModal() {
-  // Wire sign-in buttons
+  // Sign-in / Get-started / Logout buttons in the navbar
   document.querySelectorAll(".btn-sign-in").forEach((b) => {
     b.addEventListener("click", () => openAuthModal("login"));
   });
@@ -351,24 +405,12 @@ function initAuthModal() {
     b.addEventListener("click", handleLogout);
   });
 
+  // The inline modal elements (kept in HTML for legacy) — close if they somehow appear
   const closeBtn = $("authModalClose");
   if (closeBtn) closeBtn.addEventListener("click", closeAuthModal);
 
   const modal = $("authModal");
-  if (modal)
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeAuthModal();
-    });
-
-  const toLogin = $("switchToLogin");
-  const toReg = $("switchToRegister");
-  if (toLogin) toLogin.addEventListener("click", () => switchAuthMode("login"));
-  if (toReg) toReg.addEventListener("click", () => switchAuthMode("register"));
-
-  const loginForm = $("loginForm");
-  const registerForm = $("registerForm");
-  if (loginForm) loginForm.addEventListener("submit", handleLogin);
-  if (registerForm) registerForm.addEventListener("submit", handleRegister);
+  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeAuthModal(); });
 }
 
 // ============ DESTINATIONS GRID ============
@@ -1094,8 +1136,8 @@ function populateCulture(cultureMap) {
 
 async function toggleSave(countryId) {
   if (!isLoggedIn()) {
-    openAuthModal("login");
-    showToast("Please sign in to save destinations.");
+    showToast("Sign in to save destinations ✈️");
+    promptAuthRedirect("login", "Save this destination");
     return;
   }
   
@@ -1163,8 +1205,18 @@ async function renderSavedSection() {
     return;
   }
 
+  // Show a loading state while fetching
+  empty.style.display = "none";
+  grid.innerHTML += `<div id="savedLoading" style="color:var(--text-muted);padding:24px;font-size:.9rem;">Loading saved destinations…</div>`;
+
   try {
+    console.log("renderSavedSection: calling GET /api/saved-destinations …");
     const saved = await apiFetch("/saved-destinations");
+    console.log("renderSavedSection: server returned →", saved);
+    // Remove loading indicator
+    const loadingEl = $("savedLoading");
+    if (loadingEl) loadingEl.remove();
+
     if (!saved || !saved.length) {
       empty.style.display = "flex";
       empty.innerHTML = `
@@ -1208,9 +1260,14 @@ async function renderSavedSection() {
       grid.appendChild(card);
     });
   } catch (err) {
+    const loadingEl = $("savedLoading");
+    if (loadingEl) loadingEl.remove();
     console.error("Error loading saved destinations:", err);
     if (err.message.includes("Unauthorized")) {
-      // User is not authenticated, show login prompt
+      // Token expired — clear and prompt re-login
+      clearToken();
+      localStorage.removeItem("travi_user");
+      updateAuthUI();
       empty.style.display = "flex";
       empty.innerHTML = `
         <div class="empty-icon">✦</div>
@@ -1234,7 +1291,7 @@ let currentPlannerTrip = null;
 let currentPlannerDays = [];
 let currentPlannerDestinationId = null;
 
-function initPlanner() {
+async function initPlanner() {
   const newTripBtn = $("newTripBtn");
   const tripForm = $("tripForm");
   const closeTripBtn = $("closeTripModal");
@@ -1292,11 +1349,15 @@ function initPlanner() {
     });
   });
 
-  loadMyTrips();
+  await loadMyTrips();
 }
 
 function openPlannerModal(destinationId = null) {
-  // Dev mode: no sign-in required
+  if (!isLoggedIn()) {
+    showToast("Sign in to plan your trip ✈️");
+    promptAuthRedirect("login", "Create a trip plan");
+    return;
+  }
 
   populateTripDestinationSelect(destinationId);
 
@@ -1354,8 +1415,8 @@ async function handleCreatePlan(e) {
   const user = getCurrentUser();
 
   if (!user) {
-    showToast("Please log in to create a trip.", "error");
-    openAuthModal("login");
+    showToast("Please sign in to create a trip.", "error");
+    promptAuthRedirect("login", "Create a trip plan");
     return;
   }
 
@@ -1388,17 +1449,27 @@ async function handleCreatePlan(e) {
 }
 
 async function verifyCurrentUser() {
-  if (!isLoggedIn()) return null;
-  
+  if (!isLoggedIn()) {
+    console.log("verifyCurrentUser: no token, skipping");
+    return null;
+  }
   try {
+    console.log("verifyCurrentUser: calling GET /api/auth/me …");
     const user = await apiFetch("/auth/me");
+    console.log("verifyCurrentUser: server returned →", user);
     setCurrentUser(user);
     return user;
   } catch (err) {
-    // Token might be invalid
-    clearToken();
-    localStorage.removeItem("travi_user");
-    updateAuthUI();
+    console.warn("verifyCurrentUser: /auth/me failed →", err.message);
+    
+    // Only clear token for 401, not 403
+    if (err.message.includes("Unauthorized")) {
+      console.log("verifyCurrentUser: clearing token due to 401");
+      clearToken();
+      localStorage.removeItem("travi_user");
+      updateAuthUI();
+    }
+    // For 403 or other errors, keep the token and return null
     return null;
   }
 }
@@ -1442,10 +1513,16 @@ async function loadMyTrips() {
     return;
   }
 
-  const user = getCurrentUser();
+  // Use in-memory/localStorage user; if missing, fetch it now
+  let user = getCurrentUser();
   if (!user) {
-    renderPlannerEmptyState();
-    return;
+    try {
+      user = await apiFetch("/auth/me");
+      setCurrentUser(user);
+    } catch {
+      renderPlannerEmptyState();
+      return;
+    }
   }
 
   grid.innerHTML = `
@@ -1456,8 +1533,9 @@ async function loadMyTrips() {
   `;
 
   try {
-    // Use actual user ID instead of hardcoded 1
+    console.log("loadMyTrips: calling GET /api/trips/user/" + user.id + " …");
     const trips = await apiFetch(`/trips/user/${user.id}`);
+    console.log("loadMyTrips: server returned →", trips);
     renderPlannerTrips(Array.isArray(trips) ? trips : []);
   } catch (err) {
     console.error(err);
@@ -1516,7 +1594,7 @@ function renderPlannerEmptyState() {
     <div class="planner-empty">
       <div class="empty-icon">✦</div>
       <p>Sign in to create and manage your travel plans.</p>
-      <button class="btn-outline-sm" onclick="openAuthModal('login')">Sign In</button>
+      <button class="btn-outline-sm" onclick="promptAuthRedirect('login','Create a trip plan')">Sign In</button>
     </div>
   `;
 }

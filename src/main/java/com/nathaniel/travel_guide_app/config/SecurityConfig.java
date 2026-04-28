@@ -46,7 +46,10 @@ public class SecurityConfig {
                     "/admin.css",
                     "/admin.js",
                     "/style.css",
-                    "/script.js"
+                    "/script.js",
+                    "/authentication.html",   // ← new
+                    "/authentication.css",    // ← new
+                    "/authentication.js"  
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.GET,
