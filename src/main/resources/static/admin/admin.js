@@ -180,7 +180,7 @@ async function bootstrapAdminPage() {
       loadCulture().catch((err) => {
         console.warn("Culture load skipped:", err.message);
       }),
-      loadTrips().catch(err => console.warn("Trips load skipped:", err.message)),
+      //loadTrips().catch(err => console.warn("Trips load skipped:", err.message)),
       loadPlaces().catch(err => console.warn("Places load skipped:", err.message))
     ]);
   } catch (err) {

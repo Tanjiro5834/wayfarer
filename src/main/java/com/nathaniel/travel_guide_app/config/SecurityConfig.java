@@ -78,6 +78,7 @@ public class SecurityConfig {
                     "/api/countries",
                     "/api/countries/**",
                     "/api/categories",     
+                    "/api/places/**",  
                     "/api/entry-requirements/**",
                     "/api/budgets/**",
                     "/api/packing-checklists/**"
