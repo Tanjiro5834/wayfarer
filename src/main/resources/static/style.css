@@ -3310,3 +3310,157 @@ img {
     display: block;
   }
 }
+/* ============ LOGO TAGLINE ============ */
+.logo-tagline {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: -4px;
+  padding-top: 2px;
+  white-space: nowrap;
+  display: none; /* Show on larger screens */
+}
+
+@media (min-width: 900px) {
+  .logo-tagline {
+    display: block;
+  }
+}
+
+/* ============ NAV USER GROUP (logout + username) ============ */
+.nav-user-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-username-pill {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-logout-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  transition: var(--transition-fast);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.btn-logout-nav:hover {
+  color: #fff;
+  background: rgba(232, 97, 58, 0.25);
+  border-color: rgba(232, 97, 58, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ============ SECTION SUBTITLE ============ */
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+/* ============ REGION FILTER TABS ============ */
+.region-filter-wrap {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.region-filter-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(to right, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.region-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+
+.region-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.region-tab {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--navy-400);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.region-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  background: rgba(255,126,95,0.06);
+}
+
+.region-tab.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(255,126,95,0.32);
+}
+
+/* ============ DESTINATION EMPTY STATE ============ */
+.dest-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* ============ SAVED SECTION ALIVE FEEL ============ */
+.saved-section .section-subtitle {
+  font-style: italic;
+}
+
+/* ============ SAVED CARD EXTRA INFO ============ */
+.saved-card-tagline {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-style: italic;
+}

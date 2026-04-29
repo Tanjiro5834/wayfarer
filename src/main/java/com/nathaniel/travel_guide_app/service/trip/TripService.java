@@ -18,7 +18,6 @@ import com.nathaniel.travel_guide_app.dto.request.trip.ActivitySlot;
 import com.nathaniel.travel_guide_app.dto.request.trip.TripRequest;
 import com.nathaniel.travel_guide_app.dto.response.trip.TripDayResponse;
 import com.nathaniel.travel_guide_app.dto.response.trip.TripResponse;
-import com.nathaniel.travel_guide_app.entity.Category;
 import com.nathaniel.travel_guide_app.entity.Country;
 import com.nathaniel.travel_guide_app.entity.Place;
 import com.nathaniel.travel_guide_app.entity.Trip;
@@ -48,7 +47,6 @@ public class TripService {
     private final TripDayRepository tripDayRepository;
     private final PlaceRepository placeRepository;
     private final CountryRepository countryRepository;
-    private final CategoryRepository categoryRepository;
     private final TripMapper tripMapper;
     private final TripDayMapper tripDayMapper;
 

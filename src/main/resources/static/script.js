@@ -166,34 +166,23 @@ function updateAuthUI() {
   const signInBtns = document.querySelectorAll(".btn-sign-in");
   const getStartedBtns = document.querySelectorAll(".btn-get-started");
   const logoutBtns = document.querySelectorAll(".btn-logout");
+  const navUserGroups = document.querySelectorAll(".nav-user-group");
 
   signInBtns.forEach((b) => (b.style.display = loggedIn ? "none" : ""));
   getStartedBtns.forEach((b) => (b.style.display = loggedIn ? "none" : ""));
   logoutBtns.forEach((b) => (b.style.display = loggedIn ? "" : "none"));
-  
-  // Optional: Add username display in navbar
-  let usernameSpan = document.querySelector(".nav-username");
-  if (!usernameSpan && loggedIn && currentUser) {
-    // Create username display if it doesn't exist
-    const navLinks = $("navLinks");
-    if (navLinks) {
-      const li = document.createElement("li");
-      usernameSpan = document.createElement("span");
-      usernameSpan.className = "nav-username";
-      usernameSpan.style.cssText = "color: white; padding: 8px 14px; font-weight: 500;";
-      usernameSpan.textContent = currentUser.username;
-      li.appendChild(usernameSpan);
-      // Insert before logout button
-      const logoutLi = navLinks.querySelector("li:has(.btn-logout)");
-      if (logoutLi) {
-        navLinks.insertBefore(li, logoutLi);
-      }
+  navUserGroups.forEach((g) => (g.style.display = loggedIn ? "" : "none"));
+
+  // Update username pill
+  const usernamePills = document.querySelectorAll(".nav-username-pill");
+  usernamePills.forEach((pill) => {
+    if (loggedIn && currentUser) {
+      pill.textContent = currentUser.username;
+      pill.style.display = "";
+    } else {
+      pill.style.display = "none";
     }
-  } else if (usernameSpan && (!loggedIn || !currentUser)) {
-    usernameSpan.remove();
-  } else if (usernameSpan && currentUser) {
-    usernameSpan.textContent = currentUser.username;
-  }
+  });
 }
 
 // ============ AUTH REDIRECT PROMPT ============
@@ -312,6 +301,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("countries loaded:", countriesCache.length);
 
   renderDestinationsGrid();
+  initRegionTabs();
 
   console.log("renderSavedSection — isLoggedIn():", isLoggedIn());
   await renderSavedSection();
@@ -415,12 +405,22 @@ function initAuthModal() {
 
 // ============ DESTINATIONS GRID ============
 // Uses GET /api/countries (cached)
-function renderDestinationsGrid() {
+function renderDestinationsGrid(filterRegion = "all") {
   const grid = $("destinationsGrid");
   grid.innerHTML = "";
-  countriesCache.forEach((c, i) => {
+
+  const filtered = filterRegion === "all"
+    ? countriesCache
+    : countriesCache.filter(c => (c.region || "").toLowerCase() === filterRegion.toLowerCase());
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="dest-empty"><p>No destinations found in this region yet. Check back soon!</p></div>`;
+    return;
+  }
+
+  filtered.forEach((c, i) => {
     const card = el("div", "dest-card");
-    card.style.animationDelay = `${i * 0.08}s`;
+    card.style.animationDelay = `${i * 0.06}s`;
     card.innerHTML = `
       <div class="dest-card-img">
         <div class="dest-card-img-bg" style="background: ${c.gradientCss || defaultGradient(i)}; width:100%; height:100%;"></div>
@@ -442,6 +442,17 @@ function renderDestinationsGrid() {
     `;
     card.addEventListener("click", () => openCountry(c.id));
     grid.appendChild(card);
+  });
+}
+
+function initRegionTabs() {
+  const tabs = document.querySelectorAll(".region-tab");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      renderDestinationsGrid(tab.dataset.region);
+    });
   });
 }
 
@@ -1234,6 +1245,7 @@ async function renderSavedSection() {
       const flag = s.countryFlag || s.country?.flagEmoji || "🌍";
       const region = s.countryRegion || s.country?.region || "";
       const gradient = s.countryGradient || s.country?.gradientCss || defaultGradient(0);
+      const tagline = s.countryTagline || s.country?.tagline || "";
 
       const card = el("div", "saved-card");
       card.innerHTML = `
@@ -1246,6 +1258,7 @@ async function renderSavedSection() {
           <div>
             <div class="saved-card-name">${name}</div>
             <div class="saved-card-region">${region}</div>
+            ${tagline ? `<div class="saved-card-tagline">${tagline}</div>` : ''}
           </div>
           <button class="saved-remove-btn" title="Remove">✕</button>
         </div>
@@ -1393,6 +1406,22 @@ function populateTripDestinationSelect(selectedId = null) {
       `,
     )
     .join("");
+
+  // Update currency label when destination changes
+  function updateBudgetLabel() {
+    const id = Number(select.value);
+    const country = findCountry(id);
+    const label = $("tripBudgetLabel");
+    if (label && country?.currency) {
+      const info = getCurrencyInfo(country.currency.toUpperCase());
+      label.textContent = `Total Budget (${info.symbol} ${country.currency.toUpperCase()})`;
+    } else if (label) {
+      label.textContent = "Total Budget";
+    }
+  }
+
+  select.addEventListener("change", updateBudgetLabel);
+  updateBudgetLabel();
 }
 
 async function handleCreatePlan(e) {
@@ -2276,6 +2305,9 @@ function renderBudgetForecast(forecast) {
   const travelStyle = forecast.travelStyle || "SOLO";
   const dailyBudget = forecast.dailyBudget || 0;
   const numberOfDays = forecast.numberOfDays || 1;
+
+  // Use currency from forecast if provided, fallback to currentCurrencyCode
+  if (forecast.currency) currentCurrencyCode = forecast.currency.toUpperCase();
 
   // Status badge
   const statusClass = getStatusClass(status.statusMessage);

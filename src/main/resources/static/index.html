@@ -203,6 +203,7 @@
         <a class="nav-logo" href="#">
           <span class="logo-mark">T</span>
           <span class="logo-text">Travi</span>
+          <span class="logo-tagline">your world, your way</span>
         </a>
         <ul class="nav-links" id="navLinks">
           <li><a href="#explore" class="nav-link">Explore</a></li>
@@ -214,8 +215,12 @@
           <li>
             <button class="btn-primary-sm btn-get-started">Get Started</button>
           </li>
-          <li style="display: none">
-            <button class="btn-outline-sm btn-logout">Log Out</button>
+          <li class="nav-user-group" style="display: none">
+            <span class="nav-username-pill"></span>
+            <button class="btn-logout-nav btn-logout">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Log Out
+            </button>
           </li>
         </ul>
         <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -298,6 +303,21 @@
             <span class="dot dot-warm"></span>Featured Destinations
           </div>
           <h2 class="section-title">Where will you go next?</h2>
+          <p class="section-subtitle">From tropical islands to ancient cities — discover your next adventure by region.</p>
+        </div>
+        <!-- Region Filter Tabs -->
+        <div class="region-filter-wrap">
+          <div class="region-tabs" id="regionTabs">
+            <button class="region-tab active" data-region="all">🌍 All</button>
+            <button class="region-tab" data-region="Southeast Asia">🌴 Southeast Asia</button>
+            <button class="region-tab" data-region="East Asia">🏯 East Asia</button>
+            <button class="region-tab" data-region="South Asia">🕌 South Asia</button>
+            <button class="region-tab" data-region="Middle East">🌙 Middle East</button>
+            <button class="region-tab" data-region="Europe">🏰 Europe</button>
+            <button class="region-tab" data-region="Americas">🗽 Americas</button>
+            <button class="region-tab" data-region="Africa">🌿 Africa</button>
+            <button class="region-tab" data-region="Oceania">🦘 Oceania</button>
+          </div>
         </div>
         <div class="destinations-grid" id="destinationsGrid"></div>
       </div>
@@ -422,6 +442,7 @@
             <span class="dot dot-warm"></span>Your Collection
           </div>
           <h2 class="section-title">Saved Destinations</h2>
+          <p class="section-subtitle">Your personal atlas of places that called to you. Every great journey starts with a dream — keep yours here.</p>
         </div>
         <div class="saved-grid" id="savedGrid">
           <div class="saved-empty" id="savedEmpty">
@@ -510,7 +531,7 @@
           </div>
         </div>
 
-        <label>Total Budget (₱)</label>
+        <label id="tripBudgetLabel">Total Budget</label>
         <input
           id="tripTotalBudget"
           type="number"
