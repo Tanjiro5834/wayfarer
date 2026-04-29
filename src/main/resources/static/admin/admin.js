@@ -1,5 +1,5 @@
-const API_BASE = "/api";
-
+//const API_BASE = "/api";
+const API_BASE = "https://travi-app.onrender.com/api";
 let countries = [];
 let filteredCountries = [];
 let currentEditingId = null;
