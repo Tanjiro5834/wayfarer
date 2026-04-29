@@ -34,7 +34,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5500",
             "http://127.0.0.1:5500",
-            "https://travi-git-master-tanjiro5834s-projects.vercel.app"   // ← Replace this with your actual Vercel production URL
+            "https://travi-app.onrender.com",
+            "https://travi-git-master-tanjiro5834s-projects.vercel.app"  
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -76,6 +77,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                     "/api/countries",
                     "/api/countries/**",
+                    "/api/categories",     
                     "/api/entry-requirements/**",
                     "/api/budgets/**",
                     "/api/packing-checklists/**"
