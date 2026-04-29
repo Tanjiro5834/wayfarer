@@ -72,6 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Skip filter for auth endpoints and public endpoints
         return path.startsWith("/api/auth/") || 
                path.startsWith("/api/countries/") ||
+               path.startsWith("/api/admin/") || 
                path.equals("/") ||
                path.equals("/index.html") ||
                path.equals("/style.css") ||
