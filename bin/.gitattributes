@@ -1,0 +1,17 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+
+# Keep generated/minified frontend assets out of GitHub language stats
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+
+# Reduce frontend weight
+*.js linguist-detectable=true
+*.css linguist-detectable=true
+*.html linguist-detectable=true
+
+# Keep SQL counted
+*.sql linguist-language=SQL
+
+# Java dominant
+*.java linguist-detectable=true

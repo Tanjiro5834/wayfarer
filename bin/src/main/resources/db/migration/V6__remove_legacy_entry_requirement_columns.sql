@@ -1,0 +1,2 @@
+ALTER TABLE entry_requirements
+DROP COLUMN IF EXISTS proof_of_accommodation_required;

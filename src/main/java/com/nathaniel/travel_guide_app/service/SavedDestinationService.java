@@ -3,6 +3,7 @@ package com.nathaniel.travel_guide_app.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.nathaniel.travel_guide_app.dto.response.SavedDestinationResponse;
 import com.nathaniel.travel_guide_app.entity.Country;
@@ -46,14 +47,10 @@ public class SavedDestinationService {
     }
 
     public List<SavedDestinationResponse> getSavedDestinations(Long userId){
-        List<SavedDestination> savedDestinations = savedDestinationRepository.findByUserId(userId);
-        List<SavedDestinationResponse> responses = new ArrayList<>(savedDestinations.size());
-
-        for(SavedDestination sd : savedDestinations){
-            responses.add(savedDestinationMapper.mapToResponse(sd));
-        }
-
-        return responses;
+        return savedDestinationRepository.findByUserId(userId)
+        .stream()
+        .map(savedDestinationMapper::mapToResponse)
+        .collect(Collectors.toList());
     }
 
     public boolean isDestinationSaved(Long userId, Long countryId){

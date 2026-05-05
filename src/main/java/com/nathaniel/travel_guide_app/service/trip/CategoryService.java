@@ -2,6 +2,7 @@ package com.nathaniel.travel_guide_app.service.trip;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.nathaniel.travel_guide_app.dto.request.trip.CategoryRequest;
 import com.nathaniel.travel_guide_app.dto.response.trip.CategoryResponse;
@@ -19,14 +20,10 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     public List<CategoryResponse> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        List<CategoryResponse> categoryList = new ArrayList<>();
-
-        for(Category category : categories){
-            categoryList.add(categoryMapper.toResponse(category));
-        }
-
-        return categoryList;
+        return categoryRepository.findAll()
+        .stream()
+        .map(categoryMapper::toResponse)
+        .collect(Collectors.toList());
     }
 
     public Category getById(Long id) {

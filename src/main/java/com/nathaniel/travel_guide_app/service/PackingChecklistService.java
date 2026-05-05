@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.nathaniel.travel_guide_app.dto.DTOs.PackingCategoryDTO;
 import com.nathaniel.travel_guide_app.dto.request.PackingChecklistItemRequest;
@@ -28,23 +29,17 @@ public class PackingChecklistService {
     }
 
     public List<PackingCategoryDTO> getGroupedByCategory(Long countryId){
-        List<PackingChecklistItem> items = packingChecklistItemRepository
-        .findByCountryIdOrderByCategoryAscItemNameAsc(countryId);
-        
-        Map<String, List<PackingChecklistItem>> grouped = new HashMap<>();
-        for(PackingChecklistItem item : items){
-            String category = item.getCategory();
-            grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(item);
-        }
-
-        List<PackingCategoryDTO> result = new ArrayList<>();
-        for(Map.Entry<String, List<PackingChecklistItem>> entry : grouped.entrySet()){
+        return packingChecklistItemRepository.findByCountryIdOrderByCategoryAscItemNameAsc(countryId)
+        .stream()
+        .collect(Collectors.groupingBy(PackingChecklistItem::getCategory))
+        .entrySet().stream()
+        .map(entry -> {
             PackingCategoryDTO dto = new PackingCategoryDTO();
             dto.setCategory(entry.getKey());
             dto.setItems(entry.getValue());
-            result.add(dto);
-        }
-        return result;
+            return dto;
+        })
+        .collect(Collectors.toList());
     }
 
     @Transactional

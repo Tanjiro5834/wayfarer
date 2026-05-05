@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.nathaniel.travel_guide_app.entity.LocalTip;
 import com.nathaniel.travel_guide_app.repository.LocalTipRepository;
@@ -20,13 +21,8 @@ public class LocalTipService {
     }   
 
     public Map<String, List<LocalTip>> getByCountryIdGroupedByCategory(Long countryId){
-        List<LocalTip> tips = localTipRepository.findByCountryIdOrderByCategoryAsc(countryId);
-
-        Map<String, List<LocalTip>> grouped = new HashMap<>();
-        for (LocalTip tip : tips) {
-            grouped.computeIfAbsent(tip.getCategory(), k -> new ArrayList<>()).add(tip);
-        }
-
-        return grouped;
+        return localTipRepository.findByCountryIdOrderByCategoryAsc(countryId)
+        .stream()
+        .collect(Collectors.groupingBy(LocalTip::getCategory));
     }
 }

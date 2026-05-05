@@ -1,0 +1,2 @@
+ALTER TABLE places
+ADD COLUMN tips TEXT NULL;

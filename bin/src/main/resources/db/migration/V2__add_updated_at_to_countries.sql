@@ -1,0 +1,2 @@
+ALTER TABLE countries
+ADD COLUMN updated_at TIMESTAMP;
